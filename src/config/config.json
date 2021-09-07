@@ -1,8 +1,8 @@
 {
   "db": {
     "host": "localhost",
-    "port": 23306,
-    "db": "pinning-service",
+    "port": 3306,
+    "db": "pinning_service",
     "user": "root",
     "password": "root",
     "db_pool_max": 10,
