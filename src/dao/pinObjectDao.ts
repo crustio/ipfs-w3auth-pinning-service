@@ -6,7 +6,18 @@ const pinObjectDao = {
   selectPinObjectCountByQuery: selectPinObjectCountByQuery,
   selectPinObjectListByQuery: selectPinObjectListByQuery,
   selectPinObjectByRequestIdAndUserId: selectPinObjectByRequestIdAndUserId,
+  deletePinObjectByRequestIdAndUserId: deletePinObjectByRequestIdAndUserId,
 };
+
+async function deletePinObjectByRequestIdAndUserId(
+    requestId: string,
+    userId: number,
+) {
+  return commonDao.queryForUpdate(
+    `update pin_object set deleted = 1 where user_id = ? and request_id = ?`,
+    [userId, requestId]
+  );
+}
 
 async function selectPinObjectByRequestIdAndUserId(
   requestId: string,

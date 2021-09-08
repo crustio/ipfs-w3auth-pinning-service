@@ -40,6 +40,7 @@ export const PinObjects = sequelize.define(
     update_time: Sequelize.DATE,
   },
   {
+    timestamps: false,
     tableName: 'pin_object',
   }
 );

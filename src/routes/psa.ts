@@ -3,11 +3,11 @@
  * @date 2021/9/6
  */
 import * as express from 'express';
-import {query} from 'express-validator';
+import {query, body} from 'express-validator';
 import {PinObjectsQuery, PinResults, PinStatus} from '../models/PinObjects';
 import {Failure} from '../models/Failure';
 const pinObjectDao = require('../dao/pinObjectDao');
-const validate = require('../middlewares/validationHandler');
+const validate = require('../middlewares/validate/validationHandler');
 const {TextMatchingStrategy, isDate} = require('./../common/commonUtils');
 const _ = require('lodash');
 export const router = express.Router();
@@ -51,7 +51,11 @@ router.get('/pins/:requestId', (req, res) => {
     });
 });
 
-router.post('/pins/:requestId', (req, res) => {
+router.post('/pins/:requestId',
+    validate([
+    body('cid').isString().notEmpty().withMessage('cid not empty'),
+    body('')
+]), (req, res) => {
   res.json({success: true});
 });
 
@@ -60,5 +64,9 @@ router.post('/pins', (req, res) => {
 });
 
 router.delete('/pins/:requestId', (req, res) => {
-  res.json({success: true});
+  pinObjectDao
+    .deletePinObjectByRequestIdAndUserId(req.params.requestId, req.query.userId)
+    .then(() => {
+      res.sendStatus(200);
+  });
 });

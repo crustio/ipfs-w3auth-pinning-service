@@ -1,9 +1,9 @@
 import {validationResult} from 'express-validator';
 import {Request, Response} from 'express';
-import {Failure, FailureError} from '../models/Failure';
+import {Failure, FailureError} from '../../models/Failure';
 import * as _ from 'lodash';
 
-function validate(validations: any) {
+function validate(validations: any[]) {
   return async (req: Request, res: Response, next: any) => {
     for (const validation of validations) {
       const result = await validation.run(req);

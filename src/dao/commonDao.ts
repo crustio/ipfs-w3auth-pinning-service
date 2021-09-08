@@ -5,6 +5,7 @@ const commonDao = {
   queryForCount: queryForCount,
   queryForArray: queryForArray,
   queryForObj: queryForObj,
+  queryForUpdate: queryForUpdate,
 };
 
 function queryForCount(sql: string, replace: any[]): Promise<number> {
@@ -48,6 +49,18 @@ function queryForObj(sql: string, replace: any[]): Promise<any> {
       }
       return {};
     });
+}
+
+function queryForUpdate(sql: string, replace: any[]): Promise<number> {
+    return sequelize
+      .query(sql, {
+        replacements: replace,
+        type: sequelize.QueryTypes.UPDATE,
+      })
+      .then((r: any) => {
+        console.log(r)
+        return 0
+      });
 }
 
 module.exports = commonDao;

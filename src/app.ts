@@ -3,6 +3,7 @@ import * as cors from 'cors';
 import {router as adminRouter} from './routes/admin';
 import {router as psaRouter} from './routes/psa';
 import * as bodyParser from 'body-parser';
+const authHandler = require('./middlewares/auth/authHandler');
 
 const app = express();
 
@@ -12,11 +13,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use('/admin', adminRouter);
 app.use(
   '/psa',
-  (req, res, next) => {
-    // TODO: query user id from db
-    req.query.userId = '10';
-    next();
-  },
+  authHandler,
   psaRouter
 );
 app.listen(3000);
