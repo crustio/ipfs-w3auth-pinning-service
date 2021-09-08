@@ -52,15 +52,15 @@ function queryForObj(sql: string, replace: any[]): Promise<any> {
 }
 
 function queryForUpdate(sql: string, replace: any[]): Promise<number> {
-    return sequelize
-      .query(sql, {
-        replacements: replace,
-        type: sequelize.QueryTypes.UPDATE,
-      })
-      .then((r: any) => {
-        console.log(r)
-        return 0
-      });
+  return sequelize
+    .query(sql, {
+      replacements: replace,
+      type: sequelize.QueryTypes.UPDATE,
+    })
+    .then((r: any) => {
+      console.log(r);
+      return 0;
+    });
 }
 
 module.exports = commonDao;

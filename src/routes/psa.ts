@@ -51,13 +51,16 @@ router.get('/pins/:requestId', (req, res) => {
     });
 });
 
-router.post('/pins/:requestId',
-    validate([
+router.post(
+  '/pins/:requestId',
+  validate([
     body('cid').isString().notEmpty().withMessage('cid not empty'),
-    body('')
-]), (req, res) => {
-  res.json({success: true});
-});
+    body(''),
+  ]),
+  (req, res) => {
+    res.json({success: true});
+  }
+);
 
 router.post('/pins', (req, res) => {
   res.json({success: true});
@@ -68,5 +71,5 @@ router.delete('/pins/:requestId', (req, res) => {
     .deletePinObjectByRequestIdAndUserId(req.params.requestId, req.query.userId)
     .then(() => {
       res.sendStatus(200);
-  });
+    });
 });

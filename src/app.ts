@@ -11,9 +11,5 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use('/admin', adminRouter);
-app.use(
-  '/psa',
-  authHandler,
-  psaRouter
-);
+app.use('/psa', authHandler, psaRouter);
 app.listen(3000);
