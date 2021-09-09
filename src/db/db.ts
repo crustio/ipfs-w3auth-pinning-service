@@ -1,28 +1,24 @@
 require('mysql2');
 const Sequelize = require('sequelize');
-const config = require('../config/config');
+import {configs} from '../config/config';
 const {getEnv} = require('../common/commonUtils');
-const host = getEnv('MYSQL_HOST', config.db.host);
-const port = getEnv('MYSQL_PORT', config.db.port);
-const db = getEnv('MYSQL_DB', config.db.db);
-const user = getEnv('MYSQL_USER', config.db.user);
-const password = getEnv('MYSQL_PASSWORD', config.db.password);
-const dbPoolIdle = getEnv('MYSQL_DB_POOL_IDLE', config.db.db_pool_idle);
-const dbPoolAcquire = getEnv('MYSQL_PASSWORD', config.db.db_pool_acquire);
-const dbPoolMax = getEnv('MYSQL_PASSWORD', config.db.db_pool_max);
-const dbPoolMin = getEnv('MYSQL_PASSWORD', config.db.db_pool_min);
 
-export const sequelize = new Sequelize(db, user, password, {
-  host: host,
-  port: port,
-  logging: true,
-  dialect: 'mysql',
-  pool: {
-    max: dbPoolMax,
-    min: dbPoolMin,
-    idle: dbPoolIdle,
-    acquire: dbPoolAcquire,
-  },
-  operatorsAliases: false,
-  timezone: '+08:00',
-});
+export const sequelize = new Sequelize(
+  configs.db.db,
+  configs.db.user,
+  configs.db.password,
+  {
+    host: configs.db.host,
+    port: configs.db.port,
+    logging: !(getEnv('NODE_ENV', 'test') === 'production'),
+    dialect: 'mysql',
+    pool: {
+      max: configs.db.db_pool_max,
+      min: configs.db.db_pool_min,
+      idle: configs.db.db_pool_idle,
+      acquire: configs.db.db_pool_acquire,
+    },
+    operatorsAliases: false,
+    timezone: '+08:00',
+  }
+);

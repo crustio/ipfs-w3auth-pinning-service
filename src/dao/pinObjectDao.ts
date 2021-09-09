@@ -47,9 +47,7 @@ async function selectPinObjectListByQuery(
       [query.userId]
     );
     const result = await commonDao.queryForArray(sql, args);
-    console.log(result);
     pinResult.results = _.map(result, (i: any) => PinStatus.parseBaseData(i));
-    console.log(pinResult.results);
   } else {
     pinResult.results = [];
   }

@@ -99,10 +99,8 @@ export class PinStatus {
     result.status = baseData.status;
     result.created = dateFormat(baseData.create_time);
     result.pin = Pin.parseBaseData(baseData);
-    result.delegates = baseData.delegates
-      ? baseData.delegates.split(',')
-      : new Set<string>();
-    result.info = baseData.info;
+    result.delegates = baseData.delegates ? baseData.delegates.split(',') : [];
+    result.info = baseData.info ? baseData.info : {};
     return result;
   }
 }
@@ -121,6 +119,15 @@ export class Pin {
     pin.origins = baseData.origins
       ? baseData.origins.split(',')
       : new Set<string>();
+    return pin;
+  }
+
+  static parsePinFromRequest(req: any): Pin {
+    const pin = new Pin();
+    pin.cid = req.body.cid;
+    pin.name = req.body.name;
+    pin.origins = _.isEmpty(req.body.origins) ? [] : req.body.origins;
+    pin.meta = req.body.meta;
     return pin;
   }
 }

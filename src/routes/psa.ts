@@ -3,12 +3,18 @@
  * @date 2021/9/6
  */
 import * as express from 'express';
-import {query, body} from 'express-validator';
-import {PinObjectsQuery, PinResults, PinStatus} from '../models/PinObjects';
+import {query, body, param} from 'express-validator';
+import {
+  PinObjectsQuery,
+  PinResults,
+  PinStatus,
+  Pin,
+} from '../models/PinObjects';
 import {Failure} from '../models/Failure';
 const pinObjectDao = require('../dao/pinObjectDao');
 const validate = require('../middlewares/validate/validationHandler');
 const {TextMatchingStrategy, isDate} = require('./../common/commonUtils');
+import {pinByCid, replacePin} from '../service/pinning';
 const _ = require('lodash');
 export const router = express.Router();
 router.get(
@@ -55,16 +61,38 @@ router.post(
   '/pins/:requestId',
   validate([
     body('cid').isString().notEmpty().withMessage('cid not empty'),
-    body(''),
+    body('name').isString(),
+    body('origins').isArray(),
+    param('requstId').isString().notEmpty(),
   ]),
   (req, res) => {
-    res.json({success: true});
+    replacePin(
+      _.parseInt(req.query.userId),
+      req.params.requestId,
+      Pin.parsePinFromRequest(req)
+    ).then((r: PinStatus) => {
+      res.json(r);
+    });
   }
 );
 
-router.post('/pins', (req, res) => {
-  res.json({success: true});
-});
+router.post(
+  '/pins',
+  validate([
+    body('cid').isString().notEmpty().withMessage('cid not empty'),
+    body('name').isString(),
+    body('origins').optional().isArray(),
+  ]),
+  (req, res) => {
+    pinByCid(_.parseInt(req.query.userId), Pin.parsePinFromRequest(req))
+      .then((r: PinStatus) => {
+        res.json(r);
+      })
+      .catch((e: Error) => {
+        res.status(500).json(Failure.commonErr(e.message));
+      });
+  }
+);
 
 router.delete('/pins/:requestId', (req, res) => {
   pinObjectDao
