@@ -7,6 +7,7 @@ import SolanaAuth from './solanaAuth';
 const _ = require('lodash');
 const Chains = require('./../../models/Chains');
 const Users = require('./../../models/Users');
+const chainTypeDelimiter = '-';
 const chainTypes = [
   {
     type: 0,
@@ -42,10 +43,10 @@ async function auth(req: Request, res: Response, next: any) {
       );
 
       // Extract signature type. Default to 'substrate' if not specified
-      const gaugedAddress = _.includes(passedAddress, '.')
+      const gaugedAddress = _.includes(passedAddress, chainTypeDelimiter)
         ? passedAddress
-        : `substrate.${passedAddress}`;
-      const [sigType, address] = _.split(gaugedAddress, '.');
+        : `substrate${chainTypeDelimiter}${passedAddress}`;
+      const [sigType, address] = _.split(gaugedAddress, chainTypeDelimiter);
 
       // Query chain type by sigType and check signature
       const chain = await Chains.findOne({where: {chain_name: sigType}});
