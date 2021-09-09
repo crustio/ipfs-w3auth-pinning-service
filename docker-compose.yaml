@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  order-service:
+     image: ghcr.io/decooio/decoo-crust-service
+     container_name: decoo-crust-service
+     ports:
+       - 23000:3000
+     working_dir: /app
+     env_file: ./.env

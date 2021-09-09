@@ -72,7 +72,7 @@ export async function sendTx(krp: KeyringPair, tx: SubmittableExtrinsic) {
         status.isUsurped ||
         status.isRetracted
       ) {
-        reject(false);
+        reject(new Error('order invalid'));
       }
 
       if (status.isInBlock) {
