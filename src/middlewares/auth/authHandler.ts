@@ -4,6 +4,7 @@ import {AuthError} from './types';
 import SubstrateAuth from './substrateAuth';
 import EthAuth from './ethAuth';
 import SolanaAuth from './solanaAuth';
+import {logger} from '../../logger';
 const _ = require('lodash');
 const Chains = require('./../../models/Chains');
 const Users = require('./../../models/Users');
@@ -38,7 +39,7 @@ async function auth(req: Request, res: Response, next: any) {
       );
       // Parse base64 decoded AuthToken as `[substrate/eth/solana].PubKey:SignedMsg`
       const [passedAddress, sig] = _.split(credentials, ':');
-      console.log(
+      logger.info(
         `Got public address '${passedAddress}' and sigature '${sig}'`
       );
 
@@ -73,7 +74,7 @@ async function auth(req: Request, res: Response, next: any) {
         res.status(401).json(Failure.commonErr('Invalid Signature'));
       }
     } catch (error) {
-      console.error(error.message);
+      logger.error(error.message);
       res
         .status(401)
         .json(
