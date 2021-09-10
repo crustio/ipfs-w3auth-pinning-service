@@ -1,4 +1,4 @@
-name: Build Github Package
+name: Build ipfs w3auth pinning service
 
 on:
   workflow_dispatch:
