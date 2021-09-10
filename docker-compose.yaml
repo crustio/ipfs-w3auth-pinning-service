@@ -1,8 +1,8 @@
 version: "3.8"
 services:
   order-service:
-     image: ghcr.io/decooio/decoo-crust-service
-     container_name: decoo-crust-service
+     image: crustio/ipfs-w3auth-pinning-service
+     container_name: ipfs-w3auth-pinning-service
      ports:
        - 23000:3000
      working_dir: /app
