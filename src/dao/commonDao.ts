@@ -59,7 +59,7 @@ function queryForUpdate(sql: string, replace: any[]): Promise<number> {
       type: sequelize.QueryTypes.UPDATE,
     })
     .then((r: any) => {
-      logger.log(r);
+      logger.info(r);
       return 0;
     });
 }
