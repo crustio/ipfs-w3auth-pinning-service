@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  order-service:
+     image: crustio/ipfs-w3auth-pinning-service
+     container_name: ipfs-w3auth-pinning-service
+     ports:
+       - 23000:3000
+     working_dir: /app
+     env_file: ./.env
