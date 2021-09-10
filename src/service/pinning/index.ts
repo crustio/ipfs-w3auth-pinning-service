@@ -85,10 +85,10 @@ export async function updatePinObjectStatus() {
       try {
         const res = await getOrderState(api, obj.cid);
         if (res) {
-          console.log(
+          logger.info(
             `res.meaningfulData.reported_replica_count: ${res.meaningfulData.reported_replica_count}`
           );
-          console.log(
+          logger.info(
             `configs.crust.validFileSize: ${configs.crust.validFileSize}`
           );
           if (

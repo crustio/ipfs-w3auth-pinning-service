@@ -1,6 +1,6 @@
 import {AuthData} from './types';
 const nacl = require('tweetnacl');
-
+import {logger} from '../../logger';
 const bs58 = require('bs58');
 
 /**
@@ -9,7 +9,7 @@ const bs58 = require('bs58');
 function auth(data: AuthData): boolean {
   const {address, signature} = data;
 
-  console.log('Validate as solana signature.');
+  logger.info('Validate as solana signature.');
   return nacl.sign.detached.verify(
     new TextEncoder().encode(address),
     Uint8Array.from(Buffer.from(signature, 'hex')),

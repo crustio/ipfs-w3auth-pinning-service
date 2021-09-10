@@ -1,5 +1,6 @@
 const _ = require('lodash');
 import {sequelize} from '../db/db';
+import {logger} from '../logger';
 
 const commonDao = {
   queryForCount: queryForCount,
@@ -58,7 +59,7 @@ function queryForUpdate(sql: string, replace: any[]): Promise<number> {
       type: sequelize.QueryTypes.UPDATE,
     })
     .then((r: any) => {
-      console.log(r);
+      logger.log(r);
       return 0;
     });
 }
