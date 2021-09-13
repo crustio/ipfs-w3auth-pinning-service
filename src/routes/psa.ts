@@ -13,7 +13,11 @@ import {
 import {Failure} from '../models/Failure';
 const pinObjectDao = require('../dao/pinObjectDao');
 const validate = require('../middlewares/validate/validationHandler');
-const {TextMatchingStrategy, isDate} = require('./../common/commonUtils');
+const {
+  TextMatchingStrategy,
+  PinObjectStatus,
+  isDate,
+} = require('./../common/commonUtils');
 import {pinByCid, replacePin} from '../service/pinning';
 const _ = require('lodash');
 export const router = express.Router();
@@ -31,7 +35,7 @@ router.get(
       }),
     query('name').optional().isString().isLength({max: 255}),
     query('match').optional().isIn(_.keys(TextMatchingStrategy)),
-    query('status').optional().isIn(_.keys(PinStatus)),
+    query('status').optional().isIn(_.keys(PinObjectStatus)),
     query('before').custom(isDate),
     query('after').custom(isDate),
     query('limit').default(10).isInt({max: 1000, min: 1}),

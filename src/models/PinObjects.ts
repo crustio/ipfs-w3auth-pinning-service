@@ -116,9 +116,10 @@ export class Pin {
     pin.cid = baseData.cid;
     pin.name = baseData.name;
     pin.meta = baseData.meta;
-    pin.origins = baseData.origins
-      ? baseData.origins.split(',')
-      : new Set<string>();
+    pin.origins =
+      baseData.origins && baseData.origins.length > 0
+        ? baseData.origins.split(',')
+        : [];
     return pin;
   }
 
