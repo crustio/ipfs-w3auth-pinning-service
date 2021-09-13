@@ -70,20 +70,30 @@ function parsePinObjectQuery(
 ): [string, any[]] {
   let sql = baseSql;
   let args = baseArgs;
-  if (query.cid && query.cid.length > 0) {
-    sql = `${sql} and cid in (${_.map(query.cid, () => '?').join(',')})`;
+  if (query.cid) {
+    if (_.isArray(query.cid)) {
+      sql = `${sql} and cid in (${_.map(query.cid, () => '?').join(',')})`;
+    } else {
+      sql = `${sql} and cid = ?`;
+    }
     args = _.concat(args, query.cid);
   }
   if (query.after) {
-    sql = `${sql} and created >= ?`;
+    sql = `${sql} and create_time >= ?`;
     args.push(query.after);
   }
   if (query.before) {
-    sql = `${sql} and created <= ?`;
+    sql = `${sql} and create_time <= ?`;
     args.push(query.before);
   }
-  if (query.status && query.status.length > 0) {
-    sql = `${sql} and status in (${_.map(query.status, () => '?').join(',')})`;
+  if (query.status) {
+    if (_.isArray(query.status)) {
+      sql = `${sql} and status in (${_.map(query.status, () => '?').join(
+        ','
+      )})`;
+    } else {
+      sql = `${sql} and status = ?`;
+    }
     args = _.concat(args, query.status);
   }
   if (query.name) {
@@ -93,18 +103,26 @@ function parsePinObjectQuery(
   if (query.meta && query.meta.size > 0) {
     const metaSql: string[] = [];
     query.meta.forEach((value: string, key: string) => {
-      args.push(key, value);
+      let queryValue = value;
       if (query.match === TextMatchingStrategy.iexact) {
-        metaSql.push("UPPER(meta->?)=UPPER('?')");
+        queryValue = `"${value}"`;
+        metaSql.push('UPPER(meta->?)=UPPER(?)');
       } else if (query.match === TextMatchingStrategy.partial) {
-        metaSql.push("meta->? like '%?%'");
+        queryValue = `%${value}%`;
+        metaSql.push('meta->? like ?');
       } else if (query.match === TextMatchingStrategy.ipartial) {
-        metaSql.push("UPPER(meta->?) like UPPER('%?%')");
+        queryValue = `%${value}%`;
+        metaSql.push('UPPER(meta->?) like UPPER(?)');
       } else {
         metaSql.push('meta->?=?');
       }
+      args.push(`$.${key}`, queryValue);
     });
     sql = `${sql} and (${metaSql.join(' and ')})`;
+  }
+  if (query.limit) {
+    sql = `${sql} limit ?`;
+    args.push(query.limit);
   }
   return [sql, args];
 }
