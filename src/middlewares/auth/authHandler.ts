@@ -26,7 +26,7 @@ const chainTypes = [
 
 async function auth(req: Request, res: Response, next: any) {
   // Parse basic auth header 'Authorization: Basic [AuthToken]'
-  if (!_.includes(req.headers.authorization, 'Basic ')) {
+  if (!_.includes(req.headers.authorization, 'Bearer ')) {
     res.status(401).json(Failure.commonErr('Empty Signature'));
   } else {
     try {
