@@ -19,6 +19,7 @@ const {
   isDate,
 } = require('./../common/commonUtils');
 import {pinByCid, replacePin} from '../service/pinning';
+import {logger} from '../logger';
 const _ = require('lodash');
 export const router = express.Router();
 router.get(
@@ -35,7 +36,22 @@ router.get(
       }),
     query('name').optional().isString().isLength({max: 255}),
     query('match').optional().isIn(_.keys(TextMatchingStrategy)),
-    query('status').optional().isIn(_.keys(PinObjectStatus)),
+    query('status')
+      .optional()
+      .custom((value: any) => {
+        if (_.isString(value)) {
+          const pinStatus = _.keys(PinObjectStatus);
+          const values = (value as string).split(',');
+          for (const item of values) {
+            if (!_.includes(pinStatus, item)) {
+              return false;
+            }
+          }
+          return true;
+        } else {
+          return false;
+        }
+      }),
     query('before').custom(isDate),
     query('after').custom(isDate),
     query('limit').default(10).isInt({max: 1000, min: 1}),
@@ -65,8 +81,8 @@ router.post(
   '/pins/:requestId',
   validate([
     body('cid').isString().notEmpty().withMessage('cid not empty'),
-    body('name').isString(),
-    body('origins').isArray(),
+    body('name').optional().isString(),
+    body('origins').optional().isArray(),
     param('requstId').isString().notEmpty(),
   ]),
   (req, res) => {
@@ -84,7 +100,7 @@ router.post(
   '/pins',
   validate([
     body('cid').isString().notEmpty().withMessage('cid not empty'),
-    body('name').isString(),
+    body('name').optional().isString(),
     body('origins').optional().isArray(),
   ]),
   (req, res) => {
