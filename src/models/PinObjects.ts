@@ -59,10 +59,12 @@ export class PinObjectsQuery {
   static parseQuery(req: Request): PinObjectsQuery {
     const query = new PinObjectsQuery();
     query.userId = _.parseInt(req.query.userId as string);
-    query.cid = req.query.cid as string[];
+    query.cid = req.query.cid ? (req.query.cid as string).split(',') : null;
     query.name = req.query.name as string;
     query.match = req.query.match as string;
-    query.status = req.query.status as string[];
+    query.status = req.query.status
+      ? (req.query.status as string).split(',')
+      : null;
     query.before = req.query.before
       ? moment(req.query.before).format('YYYY-MM-DD HH:mm:ss')
       : null;
@@ -126,7 +128,7 @@ export class Pin {
   static parsePinFromRequest(req: any): Pin {
     const pin = new Pin();
     pin.cid = req.body.cid;
-    pin.name = req.body.name;
+    pin.name = req.body.name ? req.body.name : req.body.cid;
     pin.origins = _.isEmpty(req.body.origins) ? [] : req.body.origins;
     pin.meta = req.body.meta;
     return pin;
