@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use('/psa', authHandler, psaRouter);
 app.listen(3000);
 
-schedule.scheduleJob('0 0 * * * *', () => {
+schedule.scheduleJob('0 * * * * *', () => {
   logger.info('schedule start');
   updatePinObjectStatus()
     .then(() => {
