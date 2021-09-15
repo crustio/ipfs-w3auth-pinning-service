@@ -24,6 +24,6 @@ export const configs = {
         : 'wss://rpc-crust-mainnet.decoo.io',
     defaultFileSize: _.parseInt(getEnv('DEFAULT_FILE_SIZE', 2147483648)),
     tips: getEnv('CRUST_TIPS', 0.00005),
-    validFileSize: _.parseInt(getEnv('VALID_FILE_SIZE', 3)),
+    validFileSize: _.parseInt(getEnv('VALID_FILE_REPLICAS', 3)),
   },
 };
