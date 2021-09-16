@@ -36,8 +36,8 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
       krp,
       fileCid,
       fileSize,
-      undefined,
-      fromDecimal(tips).toFixed(0)
+      fromDecimal(tips).toFixed(0),
+      undefined
     );
     if (!res) {
       throw new Error('Order Failed');
@@ -61,7 +61,7 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
   } else {
     pinObjects.request_id = uuid();
     pinObjects.update_time = moment().format('YYYY-MM-DD HH:mm:ss');
-    pinObjects.status = PinObjectStatus.pinning;
+    pinObjects.status = PinObjectStatus.pinned;
     pinObjects.meta = pin.meta;
     pinObjects.origins = [...pin.origins].join(',');
     pinObjects.deleted = 0;
