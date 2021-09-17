@@ -5,6 +5,7 @@ import SubstrateAuth from './substrateAuth';
 import EthAuth from './ethAuth';
 import SolanaAuth from './solanaAuth';
 import {logger} from '../../logger';
+import {add} from "winston";
 const _ = require('lodash');
 const Chains = require('./../../models/Chains');
 const Users = require('./../../models/Users');
@@ -63,6 +64,7 @@ async function auth(req: Request, res: Response, next: any) {
         signature: sig,
       });
       if (isValid) {
+        logger.error(`Validate address: ${address} success`);
         // Find or create user
         const [user, created] = await Users.findOrCreate({
           where: {chain_type: chain.chain_type, address: address},
