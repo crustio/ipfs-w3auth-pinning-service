@@ -4,8 +4,8 @@ import {AuthError} from './types';
 import SubstrateAuth from './substrateAuth';
 import EthAuth from './ethAuth';
 import SolanaAuth from './solanaAuth';
+import AvalancheAuth from './avalancheAuth';
 import {logger} from '../../logger';
-import {add} from "winston";
 const _ = require('lodash');
 const Chains = require('./../../models/Chains');
 const Users = require('./../../models/Users');
@@ -22,6 +22,10 @@ const chainTypes = [
   {
     type: 2,
     authObj: SolanaAuth,
+  },
+  {
+    type: 3,
+    authObj: AvalancheAuth,
   },
 ];
 
