@@ -25,7 +25,7 @@ function auth(data: AuthData): boolean {
     return signatureVerify(wrappedMessage, hexToU8a(signature), address)
       .isValid;
   } catch (error) {
-    console.error(error.message);
+    logger.error(error.message);
   }
   return false;
 }

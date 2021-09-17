@@ -1,3 +1,5 @@
+import {logger} from "../../logger";
+
 const createHash = require('create-hash');
 import {AuthData} from './types';
 import BinTools from 'avalanche/dist/utils/bintools';
@@ -32,7 +34,7 @@ function digestMessage(msgStr: string) {
 function auth(data: AuthData): boolean {
   const bintools: BinTools = BinTools.getInstance();
 
-  console.log('Validate as avalanche signature.');
+  logger.info('Validate as avalanche signature.');
   const {address, signature} = data;
   const digest = digestMessage(address);
   const digestBuff = Buffer.from(digest.toString('hex'), 'hex');
