@@ -53,7 +53,6 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
 
 export async function orderStart(a: number) {
   for (;;) {
-      logger.error(a);
     await placeOrderQueuedFiles().catch(e => {
       logger.error(`place order queued files failed: ${JSON.stringify(e)}`);
     });
