@@ -8,6 +8,7 @@ const moment = require('moment');
 const _ = require('lodash');
 import {logger} from '../../logger';
 const Sequelize = require('sequelize');
+const {sleep} = require('../../common/commonUtils');
 const pinObjectDao = require('../../dao/pinObjectDao');
 const Op = Sequelize.Op;
 
@@ -24,9 +25,62 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
   let pinObjects = await PinObjects.findOne({
     where: {user_id: userId, cid: pin.cid},
   });
-  // order in crust
+  if (_.isEmpty(pinObjects)) {
+    const obj = {
+      name: pin.name ? pin.name : pin.cid,
+      request_id: uuid(),
+      user_id: userId,
+      cid: pin.cid,
+      status: PinObjectStatus.queued,
+      meta: pin.meta,
+      origins: [...pin.origins].join(','),
+      delegates: configs.ipfs.delegates.join(','),
+    };
+    logger.info(`obj: ${JSON.stringify(obj)}`);
+    pinObjects = await PinObjects.create(obj);
+  } else {
+    pinObjects.request_id = uuid();
+    pinObjects.update_time = moment().format('YYYY-MM-DD HH:mm:ss');
+    pinObjects.status = PinObjectStatus.queued;
+    pinObjects.meta = pin.meta;
+    pinObjects.origins = [...pin.origins].join(',');
+    pinObjects.deleted = 0;
+    pinObjects.delegates = configs.ipfs.delegates.join(',');
+    await pinObjects.save();
+  }
+  return PinStatus.parseBaseData(pinObjects);
+}
+
+export async function orderStart(a: number) {
+  for (;;) {
+      logger.error(a);
+    await placeOrderQueuedFiles().catch(e => {
+      logger.error(`place order queued files failed: ${JSON.stringify(e)}`);
+    });
+    await sleep(60000);
+  }
+}
+
+async function placeOrderQueuedFiles() {
+  logger.info('start placeOrderQueuedFiles');
+  const pinObjects = await PinObjects.findAll({
+    where: {status: PinObjectStatus.queued},
+  });
+  if (_.isEmpty(pinObjects)) {
+    logger.info('not pin objects to order');
+    return;
+  }
+  for (const obj of pinObjects) {
+    await placeOrderInCrust(obj.cid, obj.id).catch(e => {
+      logger.error(`order in crust failed: ${JSON.stringify(e)}`);
+    });
+  }
+}
+
+async function placeOrderInCrust(cid: string, objId: number) {
+  let pinStatus = PinObjectStatus.pinning;
   try {
-    const fileCid = pin.cid;
+    const fileCid = cid;
     const fileSize = configs.crust.defaultFileSize;
     const seeds = configs.crust.seed;
     const tips = configs.crust.tips;
@@ -42,33 +96,21 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
     if (!res) {
       throw new Error('Order Failed');
     }
+    pinStatus = PinObjectStatus.pinning;
   } catch (e) {
+    pinStatus = PinObjectStatus.failed;
     throw new Error(e);
+  } finally {
+    await PinObjects.update(
+      {status: pinStatus},
+      {
+        where: {
+          id: objId,
+        },
+      }
+    );
+    await sleep(configs.crust.orderTimeGap);
   }
-  if (_.isEmpty(pinObjects)) {
-    const obj = {
-      name: pin.name ? pin.name : pin.cid,
-      request_id: uuid(),
-      user_id: userId,
-      cid: pin.cid,
-      status: PinObjectStatus.pinning,
-      meta: pin.meta,
-      origins: [...pin.origins].join(','),
-      delegates: configs.ipfs.delegates.join(','),
-    };
-    logger.info(`obj: ${JSON.stringify(obj)}`);
-    pinObjects = await PinObjects.create(obj);
-  } else {
-    pinObjects.request_id = uuid();
-    pinObjects.update_time = moment().format('YYYY-MM-DD HH:mm:ss');
-    pinObjects.status = PinObjectStatus.pinned;
-    pinObjects.meta = pin.meta;
-    pinObjects.origins = [...pin.origins].join(',');
-    pinObjects.deleted = 0;
-    pinObjects.delegates = configs.ipfs.delegates.join(',');
-    await pinObjects.save();
-  }
-  return PinStatus.parseBaseData(pinObjects);
 }
 
 export async function updatePinObjectStatus() {

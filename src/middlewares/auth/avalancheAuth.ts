@@ -1,4 +1,4 @@
-import {logger} from "../../logger";
+import {logger} from '../../logger';
 
 const createHash = require('create-hash');
 import {AuthData} from './types';

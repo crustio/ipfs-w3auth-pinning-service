@@ -44,3 +44,11 @@ export const getEnv = (value: string, defaultValue: any): any => {
 export const uuid = (): string => {
   return `${uuidv4()}-${new Date().getTime()}`;
 };
+
+export function sleep(time: number) {
+  return new Promise<void>((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, time);
+  });
+}
