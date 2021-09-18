@@ -1,20 +1,32 @@
 /* eslint-disable node/no-extraneous-import */
 import {AuthData} from './types';
-import {decodeAddress, signatureVerify} from '@polkadot/util-crypto';
-import {u8aToHex} from '@polkadot/util';
+import {signatureVerify} from '@polkadot/util-crypto';
+import {stringToU8a, u8aConcat, u8aToU8a, hexToU8a} from '@polkadot/util';
 import {logger} from '../../logger';
+
 function auth(data: AuthData): boolean {
   const {address, signature} = data;
 
   try {
     logger.info('Validate as substrate signature.');
-    const publicKey = decodeAddress(address);
-    const hexPublicKey = u8aToHex(publicKey);
-    return signatureVerify(address, signature, hexPublicKey).isValid;
+
+    const message = stringToU8a(address);
+
+    if (signatureVerify(message, hexToU8a(signature), address).isValid) {
+      return true;
+    }
+
+    const wrappedMessage = u8aConcat(
+      u8aToU8a('<Bytes>'),
+      message,
+      u8aToU8a('</Bytes>')
+    );
+
+    return signatureVerify(wrappedMessage, hexToU8a(signature), address)
+      .isValid;
   } catch (error) {
     logger.error(error.message);
   }
-
   return false;
 }
 
