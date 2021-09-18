@@ -51,7 +51,17 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
   return PinStatus.parseBaseData(pinObjects);
 }
 
-export async function orderQueuedFiles() {
+export async function orderStart() {
+  for (;;) {
+    await placeOrderQueuedFiles().catch(e => {
+      logger.error(`place order queued files failed: ${JSON.stringify(e)}`);
+    });
+    await sleep(1000);
+  }
+}
+
+async function placeOrderQueuedFiles() {
+  logger.info('start placeOrderQueuedFiles');
   const pinObjects = await PinObjects.findAll({
     where: {status: PinObjectStatus.queued},
   });

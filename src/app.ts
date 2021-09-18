@@ -4,7 +4,7 @@ import {router as psaRouter} from './routes/psa';
 import * as bodyParser from 'body-parser';
 const authHandler = require('./middlewares/auth/authHandler');
 const schedule = require('node-schedule');
-import {updatePinObjectStatus, orderQueuedFiles} from './service/pinning';
+import {updatePinObjectStatus, orderStart} from './service/pinning';
 import {logger} from './logger';
 
 const app = express();
@@ -26,13 +26,10 @@ schedule.scheduleJob('0 * * * * *', () => {
     });
 });
 
-schedule.scheduleJob('0 */2 * * * *', () => {
-  logger.info('order schedule start');
-  orderQueuedFiles()
-    .then(() => {
-      logger.info('order schedule finished');
-    })
-    .catch((e: Error) => {
-      logger.error(`order status err: ${e.message}`);
-    });
-});
+orderStart()
+  .then(() => {
+    logger.info('order schedule finished');
+  })
+  .catch((e: Error) => {
+    logger.error(`order status err: ${e.message}`);
+  });
