@@ -51,12 +51,13 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
   return PinStatus.parseBaseData(pinObjects);
 }
 
-export async function orderStart() {
+export async function orderStart(a: number) {
   for (;;) {
+      logger.error(a);
     await placeOrderQueuedFiles().catch(e => {
       logger.error(`place order queued files failed: ${JSON.stringify(e)}`);
     });
-    await sleep(1000);
+    await sleep(60000);
   }
 }
 
