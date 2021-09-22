@@ -63,7 +63,12 @@ export async function orderStart() {
 async function placeOrderQueuedFiles() {
   logger.info('start placeOrderQueuedFiles');
   const pinObjects = await PinObjects.findAll({
-    where: {status: PinObjectStatus.queued},
+    where: {
+      [Op.or]: [
+        {status: PinObjectStatus.failed},
+        {status: PinObjectStatus.queued},
+      ],
+    },
   });
   if (_.isEmpty(pinObjects)) {
     logger.info('not pin objects to order');
@@ -73,6 +78,7 @@ async function placeOrderQueuedFiles() {
     await placeOrderInCrust(obj.cid, obj.id).catch(e => {
       logger.error(`order in crust failed: ${JSON.stringify(e)}`);
     });
+    await sleep(configs.crust.orderTimeGap);
   }
 }
 
@@ -108,18 +114,12 @@ async function placeOrderInCrust(cid: string, objId: number) {
         },
       }
     );
-    await sleep(configs.crust.orderTimeGap);
   }
 }
 
 export async function updatePinObjectStatus() {
   const pinningObjects = await PinObjects.findAll({
-    where: {
-      [Op.or]: [
-        {status: PinObjectStatus.pinning},
-        {status: PinObjectStatus.queued},
-      ],
-    },
+    where: {status: PinObjectStatus.pinning},
   });
   if (!_.isEmpty(pinningObjects)) {
     for (const obj of pinningObjects) {
