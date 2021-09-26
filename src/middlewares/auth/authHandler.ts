@@ -5,6 +5,7 @@ import SubstrateAuth from './substrateAuth';
 import EthAuth from './ethAuth';
 import SolanaAuth from './solanaAuth';
 import AvalancheAuth from './avalancheAuth';
+import FlowAuth from './flowAuth';
 import {logger} from '../../logger';
 const _ = require('lodash');
 const Chains = require('./../../models/Chains');
@@ -26,6 +27,10 @@ const chainTypes = [
   {
     type: 3,
     authObj: AvalancheAuth,
+  },
+  {
+    type: 4,
+    authObj: FlowAuth,
   },
 ];
 
@@ -63,12 +68,13 @@ async function auth(req: Request, res: Response, next: any) {
       if (_.isEmpty(chainObj)) {
         throw new AuthError('Unsupported web3 signature');
       }
-      const isValid = chainObj.authObj.auth({
+      const isValid = await chainObj.authObj.auth({
         address,
         signature: sig,
       });
+
       if (isValid) {
-        logger.error(`Validate address: ${address} success`);
+        logger.info(`Validate address: ${address} success`);
         // Find or create user
         const [user, created] = await Users.findOrCreate({
           where: {chain_type: chain.chain_type, address: address},
