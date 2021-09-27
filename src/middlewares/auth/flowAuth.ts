@@ -7,8 +7,7 @@ async function auth(data: AuthData): Promise<boolean> {
   const {address, signature} = data;
   const newSignature = Buffer.from(signature, 'base64').toString('ascii');
   logger.info(`address: ${address}, signature: ${newSignature}`);
-  // TODO: use main net
-  fcl.config().put('accessNode.api', 'https://access-testnet.onflow.org'); // Configure FCL's Access Node
+  fcl.config().put('accessNode.api', 'https://flow-access-mainnet.portto.io'); // Configure FCL's Access Node
   const sign = JSON.parse(newSignature);
   const MSG = Buffer.from(address).toString('hex');
   const result = await fcl.verifyUserSignatures(MSG, sign);
