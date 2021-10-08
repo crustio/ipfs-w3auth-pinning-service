@@ -199,7 +199,7 @@ async function placeOrderInCrust(cid: string, retryTimes = 0) {
 
 export async function updatePinObjectStatus() {
   const pinningObjects = await PinObjects.findAll({
-    where: {status: PinObjectStatus.pinning},
+    where: {status: PinObjectStatus.pinning, deleted: 0},
   });
   if (!_.isEmpty(pinningObjects)) {
     for (const obj of pinningObjects) {
@@ -221,6 +221,8 @@ export async function updatePinObjectStatus() {
             obj.status = PinObjectStatus.pinning;
           }
         } else {
+          // invalid file size
+          obj.deleted = 1;
           obj.status = PinObjectStatus.failed;
         }
         await obj.save();
