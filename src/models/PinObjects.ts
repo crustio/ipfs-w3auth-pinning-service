@@ -38,6 +38,8 @@ export const PinObjects = sequelize.define(
     origins: Sequelize.TEXT,
     create_time: Sequelize.DATE,
     update_time: Sequelize.DATE,
+    deleted: Sequelize.INTEGER,
+    retry_times: Sequelize.INTEGER,
   },
   {
     timestamps: false,

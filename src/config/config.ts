@@ -26,5 +26,6 @@ export const configs = {
     tips: getEnv('CRUST_TIPS', 0.00005),
     validFileSize: _.parseInt(getEnv('VALID_FILE_REPLICAS', 3)),
     orderTimeGap: _.parseInt(getEnv('ORDER_TIME_GAP', 1000)),
+    orderRetryTimes: _.parseInt(getEnv('ORDER_RETRY_TIMES', 3)),
   },
 };

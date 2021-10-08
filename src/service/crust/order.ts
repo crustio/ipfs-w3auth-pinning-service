@@ -63,7 +63,7 @@ export async function sendTx(krp: KeyringPair, tx: SubmittableExtrinsic) {
 
 interface IFileInfo {
   file_size: number;
-  expired_on: number;
+  expired_at: number;
   calculated_at: number;
   amount: number;
   prepaid: number;
@@ -85,6 +85,33 @@ export async function getOrderState(api: ApiPromise, cid: string) {
     } catch (e) {
       return null;
     }
+  }
+  return null;
+}
+
+interface BlockResult {
+  block: Block;
+}
+
+interface Block {
+  header: Header;
+}
+
+interface Header {
+  number: number;
+}
+
+export async function getFinalizeBlockNumber(api: ApiPromise) {
+  await api.isReadyOrError;
+  const res = await api.rpc.chain.getFinalizedHead();
+  if (res) {
+    const block = await api.rpc.chain.getBlock(res);
+    const data = block ? JSON.parse(JSON.stringify(block)) : null;
+    if (data) {
+      const blockData = data as BlockResult;
+      return blockData.block.header.number;
+    }
+    return null;
   }
   return null;
 }
