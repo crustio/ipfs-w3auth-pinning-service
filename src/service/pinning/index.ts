@@ -80,12 +80,14 @@ async function placeOrderQueuedFiles() {
     logger.info('not pin objects to order');
     return;
   }
-  const cidList = _(pinObjects)
-    .map((i: any) => i.cid)
-    .uniq()
+  const cidRetryGroup = _(pinObjects)
+    .groupBy((i: any) => i.cid)
+    .toPairs()
+    .map((i: any) => _.maxBy(i[1], 'retry_times'))
+    .groupBy((i: any) => i.cid)
     .value();
-  for (const cid of cidList) {
-    const needToOrder = await needOrder(cid);
+  for (const cid of _.map(cidRetryGroup, (i: any, j: any) => j)) {
+    const needToOrder = await needOrder(cid, cidRetryGroup[cid][0].retry_times);
     if (needToOrder.needOrder) {
       await placeOrderInCrust(cid, needToOrder.retryTimes).catch(e => {
         logger.error(`order in crust failed: ${JSON.stringify(e)}`);
@@ -114,7 +116,10 @@ async function placeOrderQueuedFiles() {
   }
 }
 
-async function needOrder(cid: string): Promise<PinObjectState> {
+async function needOrder(
+  cid: string,
+  retryTimes: number
+): Promise<PinObjectState> {
   const orderState = await getOrderState(api, cid);
   const result = new PinObjectState();
   if (orderState) {
@@ -126,14 +131,8 @@ async function needOrder(cid: string): Promise<PinObjectState> {
       : PinObjectStatus.pinning.toString();
     return result;
   } else {
-    const existObj = await commonDao.queryForObj(
-      'select retry_times from pin_object where cid = ? and deleted = 0 order by retry_times desc limit 1',
-      [cid]
-    );
-    result.needOrder = existObj
-      ? existObj.retry_times <= configs.crust.orderRetryTimes
-      : true;
-    result.retryTimes = existObj ? existObj.retry_times : 0;
+    result.needOrder = retryTimes <= configs.crust.orderRetryTimes;
+    result.retryTimes = retryTimes;
     result.status = !result.needOrder
       ? PinObjectStatus.failed.toString()
       : PinObjectStatus.pinning.toString();

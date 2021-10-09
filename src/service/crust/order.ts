@@ -89,29 +89,11 @@ export async function getOrderState(api: ApiPromise, cid: string) {
   return null;
 }
 
-interface BlockResult {
-  block: Block;
-}
-
-interface Block {
-  header: Header;
-}
-
-interface Header {
-  number: number;
-}
-
 export async function getFinalizeBlockNumber(api: ApiPromise) {
   await api.isReadyOrError;
-  const res = await api.rpc.chain.getFinalizedHead();
+  const res = await api.rpc.chain.getHeader();
   if (res) {
-    const block = await api.rpc.chain.getBlock(res);
-    const data = block ? JSON.parse(JSON.stringify(block)) : null;
-    if (data) {
-      const blockData = data as BlockResult;
-      return blockData.block.header.number;
-    }
-    return null;
+    return res.number.toNumber();
   }
   return null;
 }
