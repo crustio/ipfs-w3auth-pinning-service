@@ -120,24 +120,13 @@ async function needOrder(
   cid: string,
   retryTimes: number
 ): Promise<PinObjectState> {
-  const orderState = await getOrderState(api, cid);
   const result = new PinObjectState();
-  if (orderState) {
-    const expiredAt = orderState.meaningfulData.expired_at;
-    const currentBlockNumber = await getFinalizeBlockNumber(api);
-    result.needOrder = expiredAt < currentBlockNumber;
-    result.status = !result.needOrder
-      ? PinObjectStatus.pinned.toString()
-      : PinObjectStatus.pinning.toString();
-    return result;
-  } else {
-    result.needOrder = retryTimes <= configs.crust.orderRetryTimes;
-    result.retryTimes = retryTimes;
-    result.status = !result.needOrder
-      ? PinObjectStatus.failed.toString()
-      : PinObjectStatus.pinning.toString();
-    return result;
-  }
+  result.needOrder = retryTimes <= configs.crust.orderRetryTimes;
+  result.retryTimes = retryTimes;
+  result.status = !result.needOrder
+    ? PinObjectStatus.failed.toString()
+    : PinObjectStatus.pinning.toString();
+  return result;
 }
 
 class PinObjectState {
