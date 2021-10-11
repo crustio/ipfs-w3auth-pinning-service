@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@crustio/type-definitions": "^1.2.0",
+    "@elrondnetwork/erdjs": "^8.0.1-alpha.5",
     "@koa/router": "^10.1.1",
     "@onflow/fcl": "^0.0.77",
     "@onflow/types": "^0.0.5",
