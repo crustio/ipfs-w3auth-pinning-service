@@ -4,6 +4,7 @@ import {AuthError} from './types';
 import SubstrateAuth from './substrateAuth';
 import EthAuth from './ethAuth';
 import SolanaAuth from './solanaAuth';
+import ElrondAuth from './elrondAuth';
 import AvalancheAuth from './avalancheAuth';
 import FlowAuth from './flowAuth';
 import {logger} from '../../logger';
@@ -32,6 +33,10 @@ const chainTypes = [
     type: 4,
     authObj: FlowAuth,
   },
+  {
+    type: 5,
+    authObj: ElrondAuth,
+  },
 ];
 
 async function auth(req: Request, res: Response, next: any) {
@@ -57,7 +62,10 @@ async function auth(req: Request, res: Response, next: any) {
       const gaugedAddress = _.includes(passedAddress, chainTypeDelimiter)
         ? passedAddress
         : `substrate${chainTypeDelimiter}${passedAddress}`;
-      const [sigType, address] = _.split(gaugedAddress, chainTypeDelimiter);
+      const [sigType, address, txMsg] = _.split(
+        gaugedAddress,
+        chainTypeDelimiter
+      );
 
       // Query chain type by sigType and check signature
       const chain = await Chains.findOne({where: {chain_name: sigType}});
@@ -70,6 +78,7 @@ async function auth(req: Request, res: Response, next: any) {
       }
       const isValid = await chainObj.authObj.auth({
         address,
+        txMsg,
         signature: sig,
       });
 
