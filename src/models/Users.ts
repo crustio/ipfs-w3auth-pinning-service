@@ -10,7 +10,7 @@ const Users = sequelize.define(
       autoIncrement: true,
     },
     chain_type: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING(32),
       allowNull: false,
     },
     address: {
