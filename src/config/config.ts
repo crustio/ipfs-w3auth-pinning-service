@@ -16,6 +16,10 @@ export const configs = {
   ipfs: {
     delegates: [] as string[],
   },
+  evolution: {
+    schema_table: 'data_migrations',
+    location: '/migrations',
+  },
   crust: {
     seed: getEnv('CRUST_SEED', ''),
     chainWsUrl:
@@ -27,5 +31,8 @@ export const configs = {
     validFileSize: _.parseInt(getEnv('VALID_FILE_REPLICAS', 3)),
     orderTimeGap: _.parseInt(getEnv('ORDER_TIME_GAP', 1000)),
     orderRetryTimes: _.parseInt(getEnv('ORDER_RETRY_TIMES', 3)),
+  },
+  server: {
+    port: 3000,
   },
 };
