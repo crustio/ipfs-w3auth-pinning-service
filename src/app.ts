@@ -9,6 +9,7 @@ const Postgrator = require('postgrator');
 const path = require('path');
 import {updatePinObjectStatus, orderStart} from './service/pinning';
 import {logger} from './logger';
+import {sendCrustOrderWarningMsg} from './service/crust/order';
 import {configs} from './config/config';
 
 const app = express();
@@ -50,5 +51,6 @@ orderStart()
     logger.info('order schedule finished');
   })
   .catch((e: Error) => {
+    sendCrustOrderWarningMsg(`crust order crashed`, `err: ${e.message}`);
     logger.error(`order status err: ${e.message}`);
   });

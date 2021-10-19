@@ -4,7 +4,8 @@ import {configs} from '../../config/config';
 import {
   placeOrder,
   getOrderState,
-  getFinalizeBlockNumber,
+  checkingAccountBalance,
+  sendCrustOrderWarningMsg,
 } from '../crust/order';
 import {api} from '../crust/api';
 import createKeyring from '../crust/krp';
@@ -57,10 +58,24 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
 
 export async function orderStart() {
   for (;;) {
-    await placeOrderQueuedFiles().catch(e => {
-      logger.error(`place order queued files failed: ${JSON.stringify(e)}`);
-    });
-    await sleep(60000);
+    try {
+      const checkAccount = await checkingAccountBalance(api);
+      if (!checkAccount) {
+        await sleep(configs.crust.loopTimeAwait);
+        continue;
+      }
+      await placeOrderQueuedFiles().catch(e => {
+        logger.error(`place order queued files failed: ${e.message}`);
+      });
+      await sleep(configs.crust.loopTimeAwait);
+    } catch (e) {
+      logger.error(`place order loop error: ${e.message}`);
+      sendCrustOrderWarningMsg(
+        `crust-pinner(${configs.server.name}) error`,
+        `### crust-pinner(${configs.server.name}) error \n err msg: ${e.message}`
+      );
+      await sleep(configs.crust.loopTimeAwait);
+    }
   }
 }
 
@@ -73,7 +88,11 @@ async function placeOrderQueuedFiles() {
         {status: PinObjectStatus.failed},
         {status: PinObjectStatus.queued},
       ],
+      retry_times: {
+        [Op.lt]: configs.crust.orderRetryTimes,
+      },
     },
+    order: [['update_time', 'asc']],
   });
   // distinct by cid
   if (_.isEmpty(pinObjects)) {
@@ -90,16 +109,14 @@ async function placeOrderQueuedFiles() {
     const needToOrder = await needOrder(cid, cidRetryGroup[cid][0].retry_times);
     if (needToOrder.needOrder) {
       await placeOrderInCrust(cid, needToOrder.retryTimes).catch(e => {
-        logger.error(`order in crust failed: ${JSON.stringify(e)}`);
+        logger.error(`order error catch: ${JSON.stringify(e)} cid: ${cid}`);
       });
-      await sleep(configs.crust.orderTimeGap);
+      await sleep(configs.crust.orderTimeAwait);
     } else {
       await PinObjects.update(
         {
           status: needToOrder.status,
           retry_times: needToOrder.retryTimes,
-          deleted:
-            needToOrder.retryTimes > configs.crust.orderRetryTimes ? 1 : 0,
         },
         {
           where: {
@@ -144,6 +161,8 @@ async function placeOrderInCrust(cid: string, retryTimes = 0) {
     const seeds = configs.crust.seed;
     const tips = configs.crust.tips;
     const krp = createKeyring(seeds);
+    logger.info(`order cid: ${cid} in crust`);
+    pinStatus = PinObjectStatus.pinning;
     const res = await placeOrder(
       api,
       krp,
@@ -153,13 +172,14 @@ async function placeOrderInCrust(cid: string, retryTimes = 0) {
       undefined
     );
     if (!res) {
-      throw new Error('Order Failed');
+      retryTimeAdd = true;
+      pinStatus = PinObjectStatus.failed;
+      logger.error(`order cid: ${cid} failed result is empty`);
     }
-    pinStatus = PinObjectStatus.pinning;
   } catch (e) {
     pinStatus = PinObjectStatus.failed;
     retryTimeAdd = true;
-    throw new Error(e);
+    logger.error(`order cid: ${cid} failed error: ${e.toString()}`);
   } finally {
     const times =
       retryTimeAdd && retryTimes <= configs.crust.orderRetryTimes
@@ -169,7 +189,6 @@ async function placeOrderInCrust(cid: string, retryTimes = 0) {
       {
         status: pinStatus,
         retry_times: times,
-        deleted: times > configs.crust.orderRetryTimes ? 1 : 0,
       },
       {
         where: {
@@ -194,12 +213,6 @@ export async function updatePinObjectStatus() {
       try {
         const res = await getOrderState(api, obj.cid);
         if (res) {
-          logger.info(
-            `res.meaningfulData.reported_replica_count: ${res.meaningfulData.reported_replica_count}`
-          );
-          logger.info(
-            `configs.crust.validFileSize: ${configs.crust.validFileSize}`
-          );
           if (
             res.meaningfulData.reported_replica_count >=
             configs.crust.validFileSize
