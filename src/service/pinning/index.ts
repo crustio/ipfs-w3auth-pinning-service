@@ -88,6 +88,9 @@ async function placeOrderQueuedFiles() {
         {status: PinObjectStatus.failed},
         {status: PinObjectStatus.queued},
       ],
+      retry_times: {
+        [Op.lt]: configs.crust.orderRetryTimes,
+      },
     },
     order: [['update_time', 'asc']],
   });
@@ -114,8 +117,6 @@ async function placeOrderQueuedFiles() {
         {
           status: needToOrder.status,
           retry_times: needToOrder.retryTimes,
-          deleted:
-            needToOrder.retryTimes > configs.crust.orderRetryTimes ? 1 : 0,
         },
         {
           where: {
@@ -188,7 +189,6 @@ async function placeOrderInCrust(cid: string, retryTimes = 0) {
       {
         status: pinStatus,
         retry_times: times,
-        deleted: times > configs.crust.orderRetryTimes ? 1 : 0,
       },
       {
         where: {
