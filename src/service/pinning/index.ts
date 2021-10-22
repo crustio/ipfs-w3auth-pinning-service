@@ -53,6 +53,8 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
     pinObjects.meta = pin.meta;
     pinObjects.origins = [...pin.origins].join(',');
     pinObjects.delegates = configs.ipfs.delegates.join(',');
+    pinObjects.retry_times = 0;
+    pinObjects.deleted = 0;
     await pinObjects.save();
   }
   return PinStatus.parseBaseData(pinObjects);
