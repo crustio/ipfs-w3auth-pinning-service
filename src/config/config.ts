@@ -41,6 +41,7 @@ export const configs = {
       'WARNING_ACCESSTOKEN',
       'e9b202bc3bec659f31c3948295aa1864c96812c456ab3e167ed8c1e56937eaf6'
     ),
+    transactionTimeout: _.parseInt(getEnv('TRANSACTION_TIMEOUT', 60 * 1000)),
   },
   server: {
     port: 3000,

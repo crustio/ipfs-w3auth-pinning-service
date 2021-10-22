@@ -4,6 +4,8 @@ import {SubmittableExtrinsic} from '@polkadot/api/promise/types';
 import {configs} from '../../config/config';
 import {logger} from '../../logger';
 import BigNumber from 'bignumber.js';
+import {timeoutOrError} from '../../common/promise-utils';
+import {sleep} from '../../common/commonUtils';
 const ChatBot = require('dingtalk-robot-sender');
 const robot = new ChatBot({
   webhook: `https://oapi.dingtalk.com/robot/send?access_token=${configs.crust.warningAccessToken}`,
@@ -98,9 +100,9 @@ export async function sendTx(krp: KeyringPair, tx: SubmittableExtrinsic) {
           }
         });
         logger.info('Included at block hash', status.asInBlock.toHex());
+        resolve(status.asInBlock.toHex());
       } else if (status.isFinalized) {
         logger.info('Finalized block hash', status.asFinalized.toHex());
-        resolve(status.asFinalized.toHex());
       }
     }).catch((e: any) => {
       reject(e);

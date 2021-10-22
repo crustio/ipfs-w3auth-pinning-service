@@ -51,6 +51,6 @@ orderStart()
     logger.info('order schedule finished');
   })
   .catch((e: Error) => {
-    sendCrustOrderWarningMsg(`crust order crashed`, `err: ${e.message}`);
+    sendCrustOrderWarningMsg('crust order crashed', `err: ${e.message}`);
     logger.error(`order status err: ${e.message}`);
   });
