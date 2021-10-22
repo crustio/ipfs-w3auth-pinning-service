@@ -6,6 +6,7 @@ import {
   getOrderState,
   checkingAccountBalance,
   sendCrustOrderWarningMsg,
+  sendTx,
 } from '../crust/order';
 import {api} from '../crust/api';
 import createKeyring from '../crust/krp';
@@ -13,6 +14,7 @@ const commonDao = require('../../dao/commonDao');
 const moment = require('moment');
 const _ = require('lodash');
 import {logger} from '../../logger';
+import {timeoutOrError} from '../../common/promise-utils';
 const Sequelize = require('sequelize');
 const {sleep} = require('../../common/commonUtils');
 const pinObjectDao = require('../../dao/pinObjectDao');
@@ -51,6 +53,8 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
     pinObjects.meta = pin.meta;
     pinObjects.origins = [...pin.origins].join(',');
     pinObjects.delegates = configs.ipfs.delegates.join(',');
+    pinObjects.retry_times = 0;
+    pinObjects.deleted = 0;
     await pinObjects.save();
   }
   return PinStatus.parseBaseData(pinObjects);
@@ -163,13 +167,17 @@ async function placeOrderInCrust(cid: string, retryTimes = 0) {
     const krp = createKeyring(seeds);
     logger.info(`order cid: ${cid} in crust`);
     pinStatus = PinObjectStatus.pinning;
-    const res = await placeOrder(
-      api,
-      krp,
-      fileCid,
-      fileSize,
-      fromDecimal(tips).toFixed(0),
-      undefined
+    const res = await timeoutOrError(
+      'Crust place order',
+      placeOrder(
+        api,
+        krp,
+        fileCid,
+        fileSize,
+        fromDecimal(tips).toFixed(0),
+        undefined
+      ),
+      configs.crust.transactionTimeout
     );
     if (!res) {
       retryTimeAdd = true;
