@@ -22,21 +22,23 @@ export const configs = {
   },
   crust: {
     seed: getEnv('CRUST_SEED', ''),
-    chainWsUrl:
-      getEnv('NODE_ENV', 'test') === 'production'
-        ? process.env.WS_ENDPOINT
-        : 'wss://rpc-crust-mainnet.decoo.io',
+    chainWsUrl: getEnv(
+      process.env.WS_ENDPOINT,
+      'wss://rpc-crust-mainnet.decoo.io'
+    ),
     defaultFileSize: _.parseInt(getEnv('DEFAULT_FILE_SIZE', 2147483648)),
-    tips: getEnv('CRUST_TIPS', 0.00005),
+    tips: getEnv('CRUST_TIPS', 0),
     validFileSize: _.parseInt(getEnv('VALID_FILE_REPLICAS', 30)),
     orderTimeAwait: _.parseInt(getEnv('ORDER_TIME_AWAIT', 3000)),
     loopTimeAwait: _.parseInt(getEnv('LOOP_TIME_AWAIT', 20000)),
+    checkAmountTimeAwait: _.parseInt(getEnv('CHECK_AMOUNT_TIME_AWAIT', 120000)),
+    checkAmountRetryTimes: _.parseInt(getEnv('CHECK_AMOUNT_RETRY_TIMES', 3)),
     orderRetryTimes: _.parseInt(getEnv('ORDER_RETRY_TIMES', 3)),
     publicKey: getEnv(
       'CRUST_ORDER_PUBLIC_KEY',
       'cTKR5K5FdMJcZD3275PACRj7Ngwwv5MQB6zKWWnsxNe9V6uGm'
     ),
-    minimumAmount: _.parseInt(getEnv('MINIMUM_AMOUNT', 2)),
+    minimumAmount: _.parseInt(getEnv('MINIMUM_AMOUNT', 1)),
     warningAccessToken: getEnv(
       'WARNING_ACCESSTOKEN',
       'e9b202bc3bec659f31c3948295aa1864c96812c456ab3e167ed8c1e56937eaf6'

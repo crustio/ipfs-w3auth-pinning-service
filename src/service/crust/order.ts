@@ -11,9 +11,7 @@ const robot = new ChatBot({
   webhook: `https://oapi.dingtalk.com/robot/send?access_token=${configs.crust.warningAccessToken}`,
 });
 
-export async function checkingAccountBalance(
-  api: ApiPromise
-): Promise<boolean> {
+async function checkingAccountBalance(api: ApiPromise): Promise<boolean> {
   let orderBalance = await getAccountBalance(api, configs.crust.publicKey);
   orderBalance = orderBalance.dividedBy(1_000_000_000_000);
   const minimumAmount = configs.crust.minimumAmount;
@@ -29,6 +27,20 @@ export async function checkingAccountBalance(
       .dividedBy(1_000_000_000_000)
       .toString()}cru, min balance: ${minimumAmount}cru`
   );
+  return false;
+}
+
+export async function checkAccountBalanceAndWarning(
+  api: ApiPromise
+): Promise<boolean> {
+  let retryTimes = 0;
+  while (retryTimes <= configs.crust.checkAmountRetryTimes) {
+    if (await checkingAccountBalance(api)) {
+      return true;
+    }
+    await sleep(configs.crust.checkAmountTimeAwait);
+    retryTimes++;
+  }
   return false;
 }
 

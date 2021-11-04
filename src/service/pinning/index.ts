@@ -4,7 +4,7 @@ import {configs} from '../../config/config';
 import {
   placeOrder,
   getOrderState,
-  checkingAccountBalance,
+  checkAccountBalanceAndWarning,
   sendCrustOrderWarningMsg,
   sendTx,
 } from '../crust/order';
@@ -63,7 +63,7 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
 export async function orderStart() {
   for (;;) {
     try {
-      const checkAccount = await checkingAccountBalance(api);
+      const checkAccount = await checkAccountBalanceAndWarning(api);
       if (!checkAccount) {
         await sleep(configs.crust.loopTimeAwait);
         continue;
