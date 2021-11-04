@@ -38,7 +38,7 @@ export const configs = {
       'CRUST_ORDER_PUBLIC_KEY',
       'cTKR5K5FdMJcZD3275PACRj7Ngwwv5MQB6zKWWnsxNe9V6uGm'
     ),
-    minimumAmount: _.parseInt(getEnv('MINIMUM_AMOUNT', 2)),
+    minimumAmount: _.parseInt(getEnv('MINIMUM_AMOUNT', 1)),
     warningAccessToken: getEnv(
       'WARNING_ACCESSTOKEN',
       'e9b202bc3bec659f31c3948295aa1864c96812c456ab3e167ed8c1e56937eaf6'
