@@ -4,29 +4,38 @@ import {SubmittableExtrinsic} from '@polkadot/api/promise/types';
 import {configs} from '../../config/config';
 import {logger} from '../../logger';
 import BigNumber from 'bignumber.js';
-import {timeoutOrError} from '../../common/promise-utils';
 import {sleep} from '../../common/commonUtils';
+import createKeyring from './krp';
 const ChatBot = require('dingtalk-robot-sender');
 const robot = new ChatBot({
   webhook: `https://oapi.dingtalk.com/robot/send?access_token=${configs.crust.warningAccessToken}`,
 });
 
 async function checkingAccountBalance(api: ApiPromise): Promise<boolean> {
-  let orderBalance = await getAccountBalance(api, configs.crust.publicKey);
-  orderBalance = orderBalance.dividedBy(1_000_000_000_000);
-  const minimumAmount = configs.crust.minimumAmount;
-  if (orderBalance.comparedTo(minimumAmount) >= 0) {
-    return true;
+  try {
+    await api.isReady;
+    const seeds = configs.crust.seed;
+    const krp = createKeyring(seeds);
+    let orderBalance = await getAccountBalance(api, krp.address);
+    orderBalance = orderBalance.dividedBy(1_000_000_000_000);
+    const minimumAmount = configs.crust.minimumAmount;
+    if (orderBalance.comparedTo(minimumAmount) >= 0) {
+      return true;
+    }
+    logger.error(
+      `orderBalance: ${orderBalance.toFixed(5)} min: ${minimumAmount}`
+    );
+    sendCrustOrderWarningMsg(
+      'crust-pinner balance warning',
+      `### crust-pinner(${configs.server.name}) \n address: ${
+        krp.address
+      } \n current balance: ${orderBalance
+        .dividedBy(1_000_000_000_000)
+        .toString()}cru, min balance: ${minimumAmount}cru`
+    );
+  } catch (e) {
+    logger.warn(`check account balance failed: ${e.message}`);
   }
-  logger.error(
-    `orderBalance: ${orderBalance.toString()} min: ${minimumAmount}`
-  );
-  sendCrustOrderWarningMsg(
-    'crust-pinner balance warning',
-    `### crust-pinner(${configs.server.name}) \n current balance: ${orderBalance
-      .dividedBy(1_000_000_000_000)
-      .toString()}cru, min balance: ${minimumAmount}cru`
-  );
   return false;
 }
 
