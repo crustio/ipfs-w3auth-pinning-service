@@ -25,6 +25,7 @@ export const configs = {
     chainWsUrl: getEnv('WS_ENDPOINT', 'wss://rpc.crust.network'),
     defaultFileSize: _.parseInt(getEnv('DEFAULT_FILE_SIZE', 2147483648)),
     tips: getEnv('CRUST_TIPS', 0),
+    expireBlockNumber: getEnv('EXPIRE_BLOCK_NUMBER', 10 * 60 * 24 * 30),
     validFileSize: _.parseInt(getEnv('VALID_FILE_REPLICAS', 30)),
     orderTimeAwait: _.parseInt(getEnv('ORDER_TIME_AWAIT', 3000)),
     loopTimeAwait: _.parseInt(getEnv('LOOP_TIME_AWAIT', 20000)),

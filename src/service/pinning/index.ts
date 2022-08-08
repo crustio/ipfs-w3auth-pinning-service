@@ -241,3 +241,40 @@ export async function updatePinObjectStatus() {
     }
   }
 }
+
+export async function pinExpireFiles() {
+  while(true) {
+    try {
+      const pinningObjects = await PinObjects.findAll({
+        where: { status: PinObjectStatus.pinned, deleted: 0 },
+        order: [['id', 'asc']],
+        limit: 1000
+      });
+      if (_.isEmpty(pinningObjects)) {
+        await sleep(1000 * 6);
+        continue;
+      }
+      await api.isReadyOrError;
+      const hash = await api.rpc.chain.getFinalizedHead();
+      const block = await api.rpc.chain.getBlock(hash);
+      const finalizeNumber = block.block.header.number.toNumber();
+      for (const p of pinningObjects) {
+        const existFileNotPinned = await PinObjects.findOne({
+          attributes: ['id'],
+          where: { status: PinObjectStatus.queued, deleted: 0 },
+          order: [['id', 'asc']],
+          limit: 1
+        });
+        if (_.isEmpty(existFileNotPinned)) {
+          const res = await getOrderState(api, p.cid);
+          if (_.isEmpty(res) || (res.meaningfulData.expired_at <= (finalizeNumber + configs.crust.expireBlockNumber))) {
+            await PinObjects.update({status: PinObjectStatus.queued, retry_times: 0}, { where: { id: p.id } })
+          }
+        }
+        await sleep(100);
+      }
+    } catch (e) {
+      await sleep(1000 * 60);
+    }
+  }
+}
