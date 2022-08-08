@@ -7,7 +7,7 @@ const w3authHandler = require('@crustio/ipfs-w3auth-handler');
 const schedule = require('node-schedule');
 const Postgrator = require('postgrator');
 const path = require('path');
-import {updatePinObjectStatus, orderStart} from './service/pinning';
+import {updatePinObjectStatus, orderStart, pinExpireFiles} from './service/pinning';
 import {logger} from './logger';
 import {sendCrustOrderWarningMsg} from './service/crust/order';
 import {configs} from './config/config';
@@ -54,3 +54,8 @@ orderStart()
     sendCrustOrderWarningMsg('crust order crashed', `err: ${e.message}`);
     logger.error(`order status err: ${e.message}`);
   });
+
+pinExpireFiles().catch((e: Error) => {
+  sendCrustOrderWarningMsg('pin crust expire file job crashed', `pin crust expire file job crashed err: ${e.message}`);
+  logger.error(`Pin expire job crashed err: ${e.message}`);
+})
