@@ -10,7 +10,7 @@ async function auth(req: Request, res: any, next: any) {
   logger.info(`Validate chainType: ${chainType} address: ${address} success`);
   logger.info(`txMsg: ${res.txMsg} tyMsg: ${res.tyMsg}`)
   if (chainType == "xx") {
-    address = res.tyMsg
+    address = res.txMsg
   } 
   // Find or create user
   const [user, created] = await Users.findOrCreate({

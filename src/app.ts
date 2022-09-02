@@ -3,7 +3,7 @@ import * as cors from 'cors';
 import {router as psaRouter} from './routes/psa';
 import * as bodyParser from 'body-parser';
 const pinningAuthHandler = require('./middlewares/auth/authHandler');
-const w3authHandler = require('yh-ipfs-w3auth-handler');
+const w3authHandler = require('@crustio/ipfs-w3auth-handler');
 const schedule = require('node-schedule');
 const Postgrator = require('postgrator');
 const path = require('path');
