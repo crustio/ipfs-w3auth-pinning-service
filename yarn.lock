@@ -69,21 +69,6 @@
     "@onflow/fcl" "0.0.77"
     "@onflow/types" "0.0.5"
 
-"@crustio/ipfs-w3auth-handler@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.npmjs.org/@crustio/ipfs-w3auth-handler/-/ipfs-w3auth-handler-0.0.5.tgz"
-  integrity sha512-DxiqVHk+cXS4FchVkdJN8Sv+dPlhn+Uc2F7e1Y3/8qc19gLAYORUPteutCxm2VrQ0/jxgdw6QKC0dVVzRptIOg==
-  dependencies:
-    "@crustio/ipfs-w3auth-avalanche" "^0.0.1"
-    "@crustio/ipfs-w3auth-elrond" "^0.0.1"
-    "@crustio/ipfs-w3auth-ethereum" "^0.0.1"
-    "@crustio/ipfs-w3auth-flow" "^0.0.1"
-    "@crustio/ipfs-w3auth-solana" "^0.0.1"
-    "@crustio/ipfs-w3auth-substrate" "^0.0.1"
-    express "^4.17.1"
-    lodash "^4.17.21"
-    winston "^3.3.3"
-
 "@crustio/ipfs-w3auth-solana@^0.0.1":
   version "0.0.1"
   resolved "https://registry.npmjs.org/@crustio/ipfs-w3auth-solana/-/ipfs-w3auth-solana-0.0.1.tgz"
@@ -99,12 +84,12 @@
   dependencies:
     "@polkadot/api" "^5.6.1"
 
-"@crustio/type-definitions@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.nlark.com/@crustio/type-definitions/download/@crustio/type-definitions-1.2.0.tgz"
-  integrity sha1-Ihpia44YrHf7nhPmsBiAPnhye3E=
+"@crustio/type-definitions@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.npmmirror.com/@crustio/type-definitions/-/type-definitions-1.3.0.tgz#c4810da0bcef58d67439491a5cde1d0beb43a03d"
+  integrity sha512-xdW6npZTmWfDzZEVCMjRK7f7wQrU/cgIltGlvnXY2AFD2m9uBW+s6/lx9YHuLbk7y3NrrQwbp3owFuGw4A2hNw==
   dependencies:
-    "@open-web3/orml-type-definitions" "^0.8.2-9"
+    "@open-web3/orml-type-definitions" "^0.9.4-7"
 
 "@cspotcode/source-map-consumer@0.8.0":
   version "0.8.0"
@@ -860,10 +845,12 @@
   resolved "https://registry.npmjs.org/@onflow/util-uid/-/util-uid-0.0.1.tgz"
   integrity sha512-SzBscBdyn1Zoks0Wo/w7J/Ds9IZ/T+KM/wyWMwWla4PnxwBFviy1BytEQY+sM5q1UNOvaGWgGEoRmH/oOCcglA==
 
-"@open-web3/orml-type-definitions@^0.8.2-9":
-  version "0.8.2-11"
-  resolved "https://registry.nlark.com/@open-web3/orml-type-definitions/download/@open-web3/orml-type-definitions-0.8.2-11.tgz"
-  integrity sha1-VjWNNxtj+DdhI0p7EoOskAjm3d0=
+"@open-web3/orml-type-definitions@^0.9.4-7":
+  version "0.9.4-38"
+  resolved "https://registry.npmmirror.com/@open-web3/orml-type-definitions/-/orml-type-definitions-0.9.4-38.tgz#fc7642f6a518da2618ae39fa76fe046ee57c1e80"
+  integrity sha512-kV0++JlRLEf7Z1y+Jm+792zqx6Q7dzpGP73rJJmQrBaeTML5mQzu4veZ24TVtcLV6hsGjUU/ixrJODNj6CCuZQ==
+  dependencies:
+    lodash.merge "^4.6.2"
 
 "@polkadot/api-derive@5.9.1":
   version "5.9.1"
@@ -1780,6 +1767,14 @@ axios@^0.19.0:
   integrity sha512-fjgm5MvRHLhx+osE2xoekY70AhARk3a6hkN+3Io1jc00jtquGvxYlKlsFUhmUET0V5te6CcZI7lcv2Ym61mjHA==
   dependencies:
     follow-redirects "1.5.10"
+
+axios@^0.27.2:
+  version "0.27.2"
+  resolved "https://registry.npmmirror.com/axios/-/axios-0.27.2.tgz#207658cc8621606e586c85db4b41a750e756d972"
+  integrity sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==
+  dependencies:
+    follow-redirects "^1.14.9"
+    form-data "^4.0.0"
 
 backslash@^0.2.0:
   version "0.2.0"
@@ -3250,6 +3245,11 @@ follow-redirects@^1.0.0, follow-redirects@^1.10.0:
   resolved "https://registry.nlark.com/follow-redirects/download/follow-redirects-1.14.3.tgz"
   integrity sha1-atp4EY2NJMruWVWVrM3ArGq9Ai4=
 
+follow-redirects@^1.14.9:
+  version "1.15.1"
+  resolved "https://registry.npmmirror.com/follow-redirects/-/follow-redirects-1.15.1.tgz#0ca6a452306c9b276e4d3127483e29575e207ad5"
+  integrity sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==
+
 foreach@^2.0.5:
   version "2.0.5"
   resolved "https://registry.npmjs.org/foreach/-/foreach-2.0.5.tgz"
@@ -3259,6 +3259,15 @@ form-data@^3.0.0:
   version "3.0.1"
   resolved "https://registry.npmjs.org/form-data/-/form-data-3.0.1.tgz"
   integrity sha512-RHkBKtLWUVwd7SqRIvCZMEvAMoGUp0XU+seQiZejj0COz3RI3hWP4sCv3gZWWLjJTd7rGwcsF5eKZGii0r/hbg==
+  dependencies:
+    asynckit "^0.4.0"
+    combined-stream "^1.0.8"
+    mime-types "^2.1.12"
+
+form-data@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmmirror.com/form-data/-/form-data-4.0.0.tgz#93919daeaf361ee529584b9b31664dc12c9fa452"
+  integrity sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==
   dependencies:
     asynckit "^0.4.0"
     combined-stream "^1.0.8"
@@ -6420,6 +6429,29 @@ yargs@^15.0.1, yargs@^15.1.0:
     which-module "^2.0.0"
     y18n "^4.0.0"
     yargs-parser "^18.1.2"
+
+yh-ipfs-w3auth-handler@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.npmmirror.com/yh-ipfs-w3auth-handler/-/yh-ipfs-w3auth-handler-0.0.7.tgz#169abf71b3af37d4a353bf1dd40a0b601d608282"
+  integrity sha512-sgfe7AVSUry14twswWofTJ8FlnfNuDEALwy2a4HQBNBKy7bCTA/zX6wRaCZ8YereoFecOtqADsCHPG8SjDS1yQ==
+  dependencies:
+    "@crustio/ipfs-w3auth-avalanche" "^0.0.1"
+    "@crustio/ipfs-w3auth-elrond" "^0.0.1"
+    "@crustio/ipfs-w3auth-ethereum" "^0.0.1"
+    "@crustio/ipfs-w3auth-flow" "^0.0.1"
+    "@crustio/ipfs-w3auth-solana" "^0.0.1"
+    "@crustio/ipfs-w3auth-substrate" "^0.0.1"
+    express "^4.17.1"
+    lodash "^4.17.21"
+    winston "^3.3.3"
+    yh-ipfs-w3auth-xx "^0.0.1"
+
+yh-ipfs-w3auth-xx@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.npmmirror.com/yh-ipfs-w3auth-xx/-/yh-ipfs-w3auth-xx-0.0.1.tgz#9b98db61632f57ed5cdf3d2d17f9955f76e26f55"
+  integrity sha512-nafRFoF9IQZw4MF/FBnnXP9M91T/Jcg8AJ365VfujWOltsoJJnK6ITwRISMeA28A+FHrmhcOLi5V9g4tAzj1rg==
+  dependencies:
+    axios "^0.27.2"
 
 yn@3.1.1:
   version "3.1.1"
