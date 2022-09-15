@@ -21,7 +21,7 @@
     "posttest": "yarn run lint"
   },
   "dependencies": {
-    "@crustio/ipfs-w3auth-handler": "^0.0.7",
+    "@crustio/ipfs-w3auth-handler": "^0.0.10",
     "@crustio/type-definitions": "^1.3.0",
     "@elrondnetwork/erdjs": "^8.0.1-alpha.5",
     "@koa/router": "^10.1.1",
