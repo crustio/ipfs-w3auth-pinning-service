@@ -37,6 +37,14 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@crustio/ipfs-w3auth-aptos@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@crustio/ipfs-w3auth-aptos/-/ipfs-w3auth-aptos-0.0.2.tgz#c8304859c9ad66a955e5f8f1183984dcfac2fca5"
+  integrity sha512-/ZlkgYMLGpcRD9udBsZCcrmAwKQefjIFTzDMgb4DLdHOL0hNXuh/rqD5zcK7Zliv0xrjdrF2ch6yvSTOn1NLdA==
+  dependencies:
+    lodash "^4.17.21"
+    tweetnacl "^1.0.3"
+
 "@crustio/ipfs-w3auth-avalanche@^0.0.1":
   version "0.0.1"
   resolved "https://registry.npmjs.org/@crustio/ipfs-w3auth-avalanche/-/ipfs-w3auth-avalanche-0.0.1.tgz"
@@ -69,6 +77,23 @@
     "@onflow/fcl" "0.0.77"
     "@onflow/types" "0.0.5"
 
+"@crustio/ipfs-w3auth-handler@^0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@crustio/ipfs-w3auth-handler/-/ipfs-w3auth-handler-0.0.11.tgz#76ef6c901ecdbee8f2dcac3e87df224800b09ccb"
+  integrity sha512-vFi3bRPEovoL65BNFcfvnEdbvBlMzBiky/lofu64d7QnizHSNOrohoJ2XCba38llsBYcT+wIcctKcetsKBvfsg==
+  dependencies:
+    "@crustio/ipfs-w3auth-aptos" "^0.0.2"
+    "@crustio/ipfs-w3auth-avalanche" "^0.0.1"
+    "@crustio/ipfs-w3auth-elrond" "^0.0.1"
+    "@crustio/ipfs-w3auth-ethereum" "^0.0.1"
+    "@crustio/ipfs-w3auth-flow" "^0.0.1"
+    "@crustio/ipfs-w3auth-solana" "^0.0.1"
+    "@crustio/ipfs-w3auth-substrate" "^0.0.1"
+    "@crustio/ipfs-w3auth-xx" "^0.0.1"
+    express "^4.17.1"
+    lodash "^4.17.21"
+    winston "^3.3.3"
+
 "@crustio/ipfs-w3auth-solana@^0.0.1":
   version "0.0.1"
   resolved "https://registry.npmjs.org/@crustio/ipfs-w3auth-solana/-/ipfs-w3auth-solana-0.0.1.tgz"
@@ -83,6 +108,13 @@
   integrity sha512-4lTMIC3tOpeCefQnw5IIOHgrLE/a06QgfqNzMHafSkKKhRn7wEtZBgPeWAGC9m5oE0Wr8ikRLdLTnwIVGOp6Jg==
   dependencies:
     "@polkadot/api" "^5.6.1"
+
+"@crustio/ipfs-w3auth-xx@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@crustio/ipfs-w3auth-xx/-/ipfs-w3auth-xx-0.0.1.tgz#db02466184ee81a3279c1f89721ba8b97a3676d7"
+  integrity sha512-FgqVQ6y5BuithVKCztJN5WUaKwZ2uE5brDHI/YGFBhr6VUiEoIEkLjxK1Y7CmaULFuUNTJkgBXHNj/HICrlpJw==
+  dependencies:
+    axios "^0.27.2"
 
 "@crustio/type-definitions@^1.3.0":
   version "1.3.0"
@@ -6429,29 +6461,6 @@ yargs@^15.0.1, yargs@^15.1.0:
     which-module "^2.0.0"
     y18n "^4.0.0"
     yargs-parser "^18.1.2"
-
-yh-ipfs-w3auth-handler@^0.0.7:
-  version "0.0.7"
-  resolved "https://registry.npmmirror.com/yh-ipfs-w3auth-handler/-/yh-ipfs-w3auth-handler-0.0.7.tgz#169abf71b3af37d4a353bf1dd40a0b601d608282"
-  integrity sha512-sgfe7AVSUry14twswWofTJ8FlnfNuDEALwy2a4HQBNBKy7bCTA/zX6wRaCZ8YereoFecOtqADsCHPG8SjDS1yQ==
-  dependencies:
-    "@crustio/ipfs-w3auth-avalanche" "^0.0.1"
-    "@crustio/ipfs-w3auth-elrond" "^0.0.1"
-    "@crustio/ipfs-w3auth-ethereum" "^0.0.1"
-    "@crustio/ipfs-w3auth-flow" "^0.0.1"
-    "@crustio/ipfs-w3auth-solana" "^0.0.1"
-    "@crustio/ipfs-w3auth-substrate" "^0.0.1"
-    express "^4.17.1"
-    lodash "^4.17.21"
-    winston "^3.3.3"
-    yh-ipfs-w3auth-xx "^0.0.1"
-
-yh-ipfs-w3auth-xx@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.npmmirror.com/yh-ipfs-w3auth-xx/-/yh-ipfs-w3auth-xx-0.0.1.tgz#9b98db61632f57ed5cdf3d2d17f9955f76e26f55"
-  integrity sha512-nafRFoF9IQZw4MF/FBnnXP9M91T/Jcg8AJ365VfujWOltsoJJnK6ITwRISMeA28A+FHrmhcOLi5V9g4tAzj1rg==
-  dependencies:
-    axios "^0.27.2"
 
 yn@3.1.1:
   version "3.1.1"
