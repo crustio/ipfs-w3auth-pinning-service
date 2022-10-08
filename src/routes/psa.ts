@@ -70,7 +70,7 @@ router.get('/pins/:requestId', (req, res) => {
     .selectPinObjectByRequestIdAndUserId(req.params.requestId, req.query.userId)
     .then((r: PinStatus) => {
       if (_.isEmpty(r)) {
-        res.status(400).json(Failure.commonErr('not found'));
+        res.status(404).json(Failure.commonErr('not found'));
       } else {
         res.json(r);
       }
@@ -83,7 +83,7 @@ router.post(
     body('cid').isString().notEmpty().withMessage('cid not empty'),
     body('name').optional().isString(),
     body('origins').optional().isArray(),
-    param('requstId').isString().notEmpty(),
+    param('requestId').isString().notEmpty(),
   ]),
   (req, res) => {
     replacePin(
@@ -91,7 +91,7 @@ router.post(
       req.params.requestId,
       Pin.parsePinFromRequest(req)
     ).then((r: PinStatus) => {
-      res.json(r);
+      res.status(202).json(r);
     });
   }
 );
@@ -106,7 +106,7 @@ router.post(
   (req, res) => {
     pinByCid(_.parseInt(req.query.userId), Pin.parsePinFromRequest(req))
       .then((r: PinStatus) => {
-        res.json(r);
+        res.status(202).json(r);
       })
       .catch((e: Error) => {
         res.status(500).json(Failure.commonErr(e.message));
@@ -118,6 +118,6 @@ router.delete('/pins/:requestId', (req, res) => {
   pinObjectDao
     .deletePinObjectByRequestIdAndUserId(req.params.requestId, req.query.userId)
     .then(() => {
-      res.sendStatus(200);
+      res.sendStatus(202);
     });
 });
