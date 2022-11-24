@@ -79,11 +79,11 @@ function parsePinObjectQuery(
     args = _.concat(args, query.cid);
   }
   if (query.after) {
-    sql = `${sql} and create_time >= ?`;
+    sql = `${sql} and create_time > ?`;
     args.push(query.after);
   }
   if (query.before) {
-    sql = `${sql} and create_time <= ?`;
+    sql = `${sql} and create_time < ?`;
     args.push(query.before);
   }
   if (query.status) {
@@ -97,8 +97,19 @@ function parsePinObjectQuery(
     args = _.concat(args, query.status);
   }
   if (query.name) {
-    sql = `${sql} and name = ?`;
-    args.push(query.name);
+    if (query.match === TextMatchingStrategy.exact) {
+      sql = `${sql} and name = ?`;
+      args.push(query.name);
+    } else if (query.match === TextMatchingStrategy.iexact) {
+      sql = `${sql} and UPPER(name) = ?`;
+      args.push(query.name.toUpperCase());
+    } else if (query.match === TextMatchingStrategy.partial) {
+      sql = `${sql} and name like ?`;
+      args.push(`%${query.name}%`);
+    } else {
+      sql = `${sql} and UPPER(name) like ?`;
+      args.push(`%${query.name}%`);
+    }
   }
   if (query.meta && query.meta.size > 0) {
     const metaSql: string[] = [];
@@ -120,6 +131,7 @@ function parsePinObjectQuery(
     });
     sql = `${sql} and (${metaSql.join(' and ')})`;
   }
+  sql = `${sql} order by create_time desc`;
   if (query.limit) {
     sql = `${sql} limit ?`;
     args.push(query.limit);
