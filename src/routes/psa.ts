@@ -3,14 +3,15 @@
  * @date 2021/9/6
  */
 import * as express from 'express';
-import {query, body, param} from 'express-validator';
+import { query, body, param } from 'express-validator';
 import {
+  PinObjects,
   PinObjectsQuery,
   PinResults,
   PinStatus,
   Pin,
 } from '../models/PinObjects';
-import {Failure} from '../models/Failure';
+import { Failure } from '../models/Failure';
 const pinObjectDao = require('../dao/pinObjectDao');
 const validate = require('../middlewares/validate/validationHandler');
 const {
@@ -18,9 +19,10 @@ const {
   PinObjectStatus,
   isDate,
 } = require('./../common/commonUtils');
-import {pinByCid, replacePin} from '../service/pinning';
-import {logger} from '../logger';
+import { pinByCid, replacePin } from '../service/pinning';
+import { logger } from '../logger';
 const _ = require('lodash');
+const Users = require('./../models/Users');
 export const router = express.Router();
 router.get(
   '/pins',
@@ -34,7 +36,7 @@ router.get(
           return _.isString(value);
         }
       }),
-    query('name').optional().isString().isLength({max: 255}),
+    query('name').optional().isString().isLength({ max: 255 }),
     query('match').optional().isIn(_.keys(TextMatchingStrategy)),
     query('status')
       .optional()
@@ -54,7 +56,7 @@ router.get(
       }),
     query('before').custom(isDate),
     query('after').custom(isDate),
-    query('limit').default(10).isInt({max: 1000, min: 1}),
+    query('limit').default(10).isInt({ max: 1000, min: 1 }),
   ]),
   (req, res) => {
     pinObjectDao
@@ -76,6 +78,32 @@ router.get('/pins/:requestId', (req, res) => {
       }
     });
 });
+
+router.get('/value/:key',
+  validate([
+    param('key').isString().notEmpty(),
+  ]),
+  (req, res) => {
+    const user = Users.findOne({
+      where: { address: req.params.key },
+      order: [['create_time', 'DESC']]
+    });
+    if (user) {
+      const pobj = PinObjects.findOne({
+        where: { id: user.id }
+      });
+      if (pobj) {
+        res.json({
+          key: req.params.key,
+          value: pobj.cid
+        });
+      } else {
+        res.sendStatus(404);
+      }
+    } else {
+      res.sendStatus(404);
+    }
+  });
 
 router.post(
   '/pins/:requestId',
