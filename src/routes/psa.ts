@@ -83,14 +83,15 @@ router.get('/value/:key',
   validate([
     param('key').isString().notEmpty(),
   ]),
-  (req, res) => {
-    const user = Users.findOne({
+  async (req, res) => {
+    const user = await Users.findOne({
       where: { address: req.params.key },
       order: [['create_time', 'DESC']]
     });
     if (user) {
-      const pobj = PinObjects.findOne({
-        where: { id: user.id }
+      const pobj = await PinObjects.findOne({
+        where: { user_id: user.id },
+        order: [['update_time', 'DESC']]
       });
       if (pobj) {
         res.json({
