@@ -79,24 +79,28 @@ router.get('/pins/:requestId', (req, res) => {
     });
 });
 
-router.get('/value/:key',
+router.get('/cids/:address',
   validate([
-    param('key').isString().notEmpty(),
+    param('address').isString().notEmpty(),
   ]),
   async (req, res) => {
     const user = await Users.findOne({
-      where: { address: req.params.key },
+      where: { address: req.params.address },
       order: [['create_time', 'DESC']]
     });
     if (user) {
-      const pobj = await PinObjects.findOne({
+      const pobjs = await PinObjects.findAll({
         where: { user_id: user.id },
         order: [['update_time', 'DESC']]
       });
-      if (pobj) {
+      if (pobjs) {
+        const cids = []
+        for (let p of pobjs) {
+          cids.push(p.cid)
+        }
         res.json({
-          key: req.params.key,
-          value: pobj.cid
+          address: req.params.address,
+          cids: cids
         });
       } else {
         res.sendStatus(404);
