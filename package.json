@@ -20,6 +20,10 @@
     "pretest": "yarn run compile",
     "posttest": "yarn run lint"
   },
+  "resolutions": {
+    "@crustio/ipfs-w3auth-substrate": "0.0.4",
+    "usb": "1.8.8"
+  },
   "dependencies": {
     "@crustio/ipfs-w3auth-handler": "^0.0.18",
     "@crustio/type-definitions": "^1.3.0",
