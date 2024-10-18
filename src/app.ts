@@ -4,12 +4,9 @@ import {router as psaRouter} from './routes/psa';
 import * as bodyParser from 'body-parser';
 const pinningAuthHandler = require('./middlewares/auth/authHandler');
 const w3authHandler = require('@crustio/ipfs-w3auth-handler');
-const schedule = require('node-schedule');
 const Postgrator = require('postgrator');
 const path = require('path');
 import {updatePinObjectStatus, orderStart, pinExpireFiles} from './service/pinning';
-import {logger} from './logger';
-import {sendCrustOrderWarningMsg} from './service/crust/order';
 import {configs} from './config/config';
 
 const app = express();
@@ -32,30 +29,8 @@ const postgrator = new Postgrator({
 });
 
 postgrator.migrate('max').then((migrations: any) => {
-  app.listen(configs.server.port);
+    app.listen(configs.server.port);
+    updatePinObjectStatus();
+    orderStart();
+    pinExpireFiles();
 });
-
-schedule.scheduleJob('0 * * * * *', () => {
-  logger.info('pin status schedule start');
-  updatePinObjectStatus()
-    .then(() => {
-      logger.info('pin status schedule finished');
-    })
-    .catch((e: Error) => {
-      logger.error(`pin status update err: ${e.message}`);
-    });
-});
-
-orderStart()
-  .then(() => {
-    logger.info('order schedule finished');
-  })
-  .catch((e: Error) => {
-    sendCrustOrderWarningMsg('crust order crashed', `err: ${e.message}`);
-    logger.error(`order status err: ${e.message}`);
-  });
-
-pinExpireFiles().catch((e: Error) => {
-  sendCrustOrderWarningMsg('pin crust expire file job crashed', `pin crust expire file job crashed err: ${e.message}`);
-  logger.error(`Pin expire job crashed err: ${e.message}`);
-})

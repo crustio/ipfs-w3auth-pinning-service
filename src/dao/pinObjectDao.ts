@@ -1,4 +1,5 @@
 import {PinObjectsQuery, PinResults, PinStatus} from '../models/PinObjects';
+import {PinObjectStatus} from "../common/commonUtils";
 const {TextMatchingStrategy} = require('../common/commonUtils');
 const _ = require('lodash');
 const commonDao = require('./commonDao');
@@ -7,6 +8,7 @@ const pinObjectDao = {
   selectPinObjectListByQuery: selectPinObjectListByQuery,
   selectPinObjectByRequestIdAndUserId: selectPinObjectByRequestIdAndUserId,
   deletePinObjectByRequestIdAndUserId: deletePinObjectByRequestIdAndUserId,
+  queryPinningObjects: queryPinningObjects,
 };
 
 async function deletePinObjectByRequestIdAndUserId(
@@ -17,6 +19,13 @@ async function deletePinObjectByRequestIdAndUserId(
     'update pin_object set deleted = 1 where user_id = ? and request_id = ?',
     [userId, requestId]
   );
+}
+
+async function queryPinningObjects(limit: number = 100) {
+    return commonDao.queryForArray(
+        'select * from pin_object where deleted = ? and status = ? limit ?',
+        [0, PinObjectStatus.pinning, limit]
+    );
 }
 
 async function selectPinObjectByRequestIdAndUserId(
