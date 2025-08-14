@@ -6,7 +6,11 @@ const pinningAuthHandler = require('./middlewares/auth/authHandler');
 const w3authHandler = require('@crustio/ipfs-w3auth-handler');
 const Postgrator = require('postgrator');
 const path = require('path');
-import {updatePinObjectStatus, orderStart, pinExpireFiles} from './service/pinning';
+import {
+  updatePinObjectStatus,
+  orderStart,
+  pinExpireFiles,
+} from './service/pinning';
 import {configs} from './config/config';
 
 const app = express();
@@ -29,8 +33,8 @@ const postgrator = new Postgrator({
 });
 
 postgrator.migrate('max').then((migrations: any) => {
-    app.listen(configs.server.port);
-    updatePinObjectStatus();
-    orderStart();
-    pinExpireFiles();
+  app.listen(configs.server.port);
+  updatePinObjectStatus();
+  orderStart();
+  pinExpireFiles();
 });

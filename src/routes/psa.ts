@@ -3,7 +3,7 @@
  * @date 2021/9/6
  */
 import * as express from 'express';
-import { query, body, param } from 'express-validator';
+import {query, body, param} from 'express-validator';
 import {
   PinObjects,
   PinObjectsQuery,
@@ -11,7 +11,7 @@ import {
   PinStatus,
   Pin,
 } from '../models/PinObjects';
-import { Failure } from '../models/Failure';
+import {Failure} from '../models/Failure';
 const pinObjectDao = require('../dao/pinObjectDao');
 const validate = require('../middlewares/validate/validationHandler');
 const {
@@ -19,8 +19,8 @@ const {
   PinObjectStatus,
   isDate,
 } = require('./../common/commonUtils');
-import { pinByCid, replacePin } from '../service/pinning';
-import { logger } from '../logger';
+import {pinByCid, replacePin} from '../service/pinning';
+import {logger} from '../logger';
 const _ = require('lodash');
 const Users = require('./../models/Users');
 export const router = express.Router();
@@ -36,7 +36,7 @@ router.get(
           return _.isString(value);
         }
       }),
-    query('name').optional().isString().isLength({ max: 255 }),
+    query('name').optional().isString().isLength({max: 255}),
     query('match').optional().isIn(_.keys(TextMatchingStrategy)),
     query('status')
       .optional()
@@ -56,7 +56,7 @@ router.get(
       }),
     query('before').custom(isDate),
     query('after').custom(isDate),
-    query('limit').default(10).isInt({ max: 1000, min: 1 }),
+    query('limit').default(10).isInt({max: 1000, min: 1}),
   ]),
   (req, res) => {
     pinObjectDao
@@ -79,28 +79,27 @@ router.get('/pins/:requestId', (req, res) => {
     });
 });
 
-router.get('/cids/:address',
-  validate([
-    param('address').isString().notEmpty(),
-  ]),
+router.get(
+  '/cids/:address',
+  validate([param('address').isString().notEmpty()]),
   async (req, res) => {
     const user = await Users.findOne({
-      where: { address: req.params.address },
-      order: [['create_time', 'DESC']]
+      where: {address: req.params.address},
+      order: [['create_time', 'DESC']],
     });
     if (user) {
       const pobjs = await PinObjects.findAll({
-        where: { user_id: user.id },
-        order: [['update_time', 'DESC']]
+        where: {user_id: user.id},
+        order: [['update_time', 'DESC']],
       });
       if (pobjs) {
-        const cids = []
-        for (let p of pobjs) {
-          cids.push(p.cid)
+        const cids = [];
+        for (const p of pobjs) {
+          cids.push(p.cid);
         }
         res.json({
           address: req.params.address,
-          cids: cids
+          cids: cids,
         });
       } else {
         res.sendStatus(404);
@@ -108,7 +107,8 @@ router.get('/cids/:address',
     } else {
       res.sendStatus(404);
     }
-  });
+  }
+);
 
 router.post(
   '/pins/:requestId',

@@ -1,22 +1,19 @@
-import {Pin, PinStatus, PinObjects} from '../../models/PinObjects';
-import {uuid, PinObjectStatus, fromDecimal} from '../../common/commonUtils';
+import {ApiPromise} from '@polkadot/api';
+import {PinObjectStatus, fromDecimal, uuid} from '../../common/commonUtils';
+import {timeoutOrError} from '../../common/promise-utils';
 import {configs} from '../../config/config';
-import {
-  placeOrder,
-  getOrderState,
-  checkAccountBalanceAndWarning,
-  sendCrustOrderWarningMsg,
-  sendTx,
-} from '../crust/order';
-import {apiConnect, disconnectApi} from '../crust/api';
+import {logger} from '../../logger';
+import {Pin, PinObjects, PinStatus} from '../../models/PinObjects';
+import {apiConnect} from '../crust/api';
 import createKeyring from '../crust/krp';
-const commonDao = require('../../dao/commonDao');
+import {
+  checkAccountBalanceAndWarning,
+  getOrderState,
+  placeOrder,
+  sendCrustOrderWarningMsg,
+} from '../crust/order';
 const moment = require('moment');
 const _ = require('lodash');
-import {logger} from '../../logger';
-import {timeoutOrError} from '../../common/promise-utils';
-import {ApiPromise} from "@polkadot/api";
-import {disconnect} from "node:cluster";
 const Sequelize = require('sequelize');
 const {sleep} = require('../../common/commonUtils');
 const pinObjectDao = require('../../dao/pinObjectDao');
@@ -64,9 +61,8 @@ export async function pinByCid(userId: number, pin: Pin): Promise<PinStatus> {
 
 export async function orderStart() {
   while (true) {
-    let apiPromise;
     try {
-      apiPromise = apiConnect();
+      const apiPromise = await apiConnect();
       const checkAccount = await checkAccountBalanceAndWarning(apiPromise);
       if (!checkAccount) {
         await sleep(configs.crust.loopTimeAwait);
@@ -81,8 +77,6 @@ export async function orderStart() {
         `### crust-pinner(${configs.server.name}) error \n err msg: ${e.message}`
       );
       await sleep(configs.crust.loopTimeAwait);
-    } finally {
-      await disconnectApi(apiPromise)
     }
   }
 }
@@ -115,9 +109,11 @@ async function placeOrderQueuedFiles(apiPromise: ApiPromise) {
   for (const cid of _.map(cidRetryGroup, (i: any, j: any) => j)) {
     const needToOrder = await needOrder(cid, cidRetryGroup[cid][0].retry_times);
     if (needToOrder.needOrder) {
-      await placeOrderInCrust(apiPromise, cid, needToOrder.retryTimes).catch(e => {
-        logger.error(`order error catch: ${JSON.stringify(e)} cid: ${cid}`);
-      });
+      await placeOrderInCrust(apiPromise, cid, needToOrder.retryTimes).catch(
+        e => {
+          logger.error(`order error catch: ${JSON.stringify(e)} cid: ${cid}`);
+        }
+      );
       await sleep(configs.crust.orderTimeAwait);
     } else {
       await PinObjects.update(
@@ -159,7 +155,11 @@ class PinObjectState {
   status: string;
 }
 
-async function placeOrderInCrust(apiPromise: ApiPromise, cid: string, retryTimes = 0) {
+async function placeOrderInCrust(
+  apiPromise: ApiPromise,
+  cid: string,
+  retryTimes = 0
+) {
   let pinStatus = PinObjectStatus.pinning;
   let retryTimeAdd = false;
   try {
@@ -216,55 +216,56 @@ async function placeOrderInCrust(apiPromise: ApiPromise, cid: string, retryTimes
 }
 
 export async function updatePinObjectStatus() {
-  let apiPromise;
   while (true) {
-      try {
-        const pinningObjects = await pinObjectDao.queryPinningObjects();
-        if (_.isEmpty(pinningObjects)) {
-          await sleep(configs.crust.loopTimeAwait);
-          continue;
-        }
-        apiPromise = apiConnect();
-        for (const obj of pinningObjects) {
-            const res = await getOrderState(apiPromise, obj.cid);
-            if (res) {
-              if (
-                  res.meaningfulData.reported_replica_count >=
-                  configs.crust.validFileSize
-              ) {
-                obj.status = PinObjectStatus.pinned;
-              } else {
-                obj.status = PinObjectStatus.pinning;
-              }
-            } else {
-              // invalid file size
-              obj.deleted = 1;
-              obj.status = PinObjectStatus.failed;
-            }
-            await PinObjects.update({
-                status: obj.status,
-                deleted: obj.deleted,
-            }, {
-                where: { id: obj.id }
-            });
-        }
-      } catch (e) {
-        logger.error(`get order state err: ${e}`);
-      } finally {
-        await disconnectApi(apiPromise);
+    try {
+      const pinningObjects = await pinObjectDao.queryPinningObjects();
+      if (_.isEmpty(pinningObjects)) {
+        await sleep(configs.crust.loopTimeAwait);
+        continue;
       }
+      const apiPromise = await apiConnect();
+      for (const obj of pinningObjects) {
+        const res = await getOrderState(apiPromise, obj.cid);
+        if (res) {
+          if (
+            res.meaningfulData.reported_replica_count >=
+            configs.crust.validFileSize
+          ) {
+            obj.status = PinObjectStatus.pinned;
+          } else {
+            obj.status = PinObjectStatus.pinning;
+          }
+        } else {
+          // invalid file size
+          obj.deleted = 1;
+          obj.status = PinObjectStatus.failed;
+        }
+        await PinObjects.update(
+          {
+            status: obj.status,
+            deleted: obj.deleted,
+          },
+          {
+            where: {id: obj.id},
+          }
+        );
+      }
+      await sleep(configs.crust.loopTimeAwait);
+    } catch (e) {
+      logger.error(`get order state err: ${e}`);
+      await sleep(configs.crust.loopTimeAwait);
+    }
   }
 }
 
 export async function pinExpireFiles() {
-  let apiPromise;
-  while(true) {
+  while (true) {
     try {
-      apiPromise = apiConnect();
+      const apiPromise = await apiConnect();
       const pinningObjects = await PinObjects.findAll({
-        where: { status: PinObjectStatus.pinned, deleted: 0 },
+        where: {status: PinObjectStatus.pinned, deleted: 0},
         order: [['id', 'asc']],
-        limit: 1000
+        limit: 1000,
       });
       if (_.isEmpty(pinningObjects)) {
         await sleep(1000 * 6);
@@ -276,22 +277,27 @@ export async function pinExpireFiles() {
       for (const p of pinningObjects) {
         const existFileNotPinned = await PinObjects.findOne({
           attributes: ['id'],
-          where: { status: PinObjectStatus.queued, deleted: 0 },
+          where: {status: PinObjectStatus.queued, deleted: 0},
           order: [['id', 'asc']],
-          limit: 1
+          limit: 1,
         });
         if (_.isEmpty(existFileNotPinned)) {
           const res = await getOrderState(apiPromise, p.cid);
-          if (_.isEmpty(res) || (res.meaningfulData.expired_at <= (finalizeNumber + configs.crust.expireBlockNumber))) {
-            await PinObjects.update({status: PinObjectStatus.queued, retry_times: 0}, { where: { id: p.id } })
+          if (
+            _.isEmpty(res) ||
+            res.meaningfulData.expired_at <=
+              finalizeNumber + configs.crust.expireBlockNumber
+          ) {
+            await PinObjects.update(
+              {status: PinObjectStatus.queued, retry_times: 0},
+              {where: {id: p.id}}
+            );
           }
         }
         await sleep(100);
       }
     } catch (e) {
       await sleep(1000 * 60);
-    } finally {
-      await disconnectApi(apiPromise);
     }
   }
 }

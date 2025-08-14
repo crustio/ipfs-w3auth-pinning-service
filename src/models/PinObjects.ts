@@ -4,7 +4,9 @@ import {Request} from 'express';
 const _ = require('lodash');
 const moment = require('moment');
 
-const DEFAULT_DELEGATES = ['/ip4/183.131.193.198/tcp/14001/p2p/12D3KooWMcAHcs97R49PLZjGUKDbP1fr9iijeepod8fkktHTLCgN'];
+const DEFAULT_DELEGATES = [
+  '/ip4/183.131.193.198/tcp/14001/p2p/12D3KooWMcAHcs97R49PLZjGUKDbP1fr9iijeepod8fkktHTLCgN',
+];
 
 export const PinObjects = sequelize.define(
   'pin_object',
@@ -105,7 +107,9 @@ export class PinStatus {
     result.status = baseData.status;
     result.created = dateFormat(baseData.create_time);
     result.pin = Pin.parseBaseData(baseData);
-    result.delegates = baseData.delegates ? baseData.delegates.split(',') : DEFAULT_DELEGATES;
+    result.delegates = baseData.delegates
+      ? baseData.delegates.split(',')
+      : DEFAULT_DELEGATES;
     result.info = baseData.info ? baseData.info : {};
     return result;
   }

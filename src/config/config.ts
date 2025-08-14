@@ -33,10 +33,7 @@ export const configs = {
     checkAmountRetryTimes: _.parseInt(getEnv('CHECK_AMOUNT_RETRY_TIMES', 3)),
     orderRetryTimes: _.parseInt(getEnv('ORDER_RETRY_TIMES', 3)),
     minimumAmount: _.parseInt(getEnv('MINIMUM_AMOUNT', 1)),
-    warningAccessToken: getEnv(
-      'WARNING_ACCESSTOKEN',
-      ''
-    ),
+    warningAccessToken: getEnv('WARNING_ACCESSTOKEN', ''),
     transactionTimeout: _.parseInt(getEnv('TRANSACTION_TIMEOUT', 60 * 1000)),
   },
   server: {

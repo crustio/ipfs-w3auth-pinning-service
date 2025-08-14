@@ -1,10 +1,10 @@
-import { KeyringPair } from '@polkadot/keyring/types';
-import { ApiPromise } from '@polkadot/api';
-import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
-import { configs } from '../../config/config';
-import { logger } from '../../logger';
+import {KeyringPair} from '@polkadot/keyring/types';
+import {ApiPromise} from '@polkadot/api';
+import {SubmittableExtrinsic} from '@polkadot/api/promise/types';
+import {configs} from '../../config/config';
+import {logger} from '../../logger';
 import BigNumber from 'bignumber.js';
-import { sleep } from '../../common/commonUtils';
+import {sleep} from '../../common/commonUtils';
 import createKeyring from './krp';
 const ChatBot = require('dingtalk-robot-sender');
 const robot = new ChatBot({
@@ -27,7 +27,8 @@ async function checkingAccountBalance(api: ApiPromise): Promise<boolean> {
     );
     sendCrustOrderWarningMsg(
       'crust-pinner balance warning',
-      `### crust-pinner(${configs.server.name}) \n address: ${krp.address
+      `### crust-pinner(${configs.server.name}) \n address: ${
+        krp.address
       } \n current balance: ${orderBalance
         .dividedBy(1_000_000_000_000)
         .toString()}cru, min balance: ${minimumAmount}cru`
@@ -67,7 +68,7 @@ export async function getAccountBalance(
   api: ApiPromise,
   account: string
 ): Promise<BigNumber> {
-  await api.isReadyOrError;
+  await api.isReady;
   const infoStr = await api.query.system.account(account);
   const info = JSON.parse(JSON.stringify(infoStr));
   return new BigNumber(info.data.free);
@@ -82,7 +83,7 @@ export async function placeOrder(
   memo: string
 ) {
   // Determine whether to connect to the chain
-  await api.isReadyOrError;
+  await api.isReady;
   // Generate transaction
   // fileCid, fileSize, tip, 0
   const pso = api.tx.market.placeStorageOrder(fileCID, fileSize, tip, memo);
@@ -92,7 +93,7 @@ export async function placeOrder(
 
 export async function sendTx(krp: KeyringPair, tx: SubmittableExtrinsic) {
   return new Promise((resolve, reject) => {
-    tx.signAndSend(krp, ({ events = [], status }) => {
+    tx.signAndSend(krp, ({events = [], status}) => {
       logger.info(
         `  ↪ 💸 [tx]: Transaction status: ${status.type}, nonce: ${tx.nonce}`
       );
@@ -107,7 +108,7 @@ export async function sendTx(krp: KeyringPair, tx: SubmittableExtrinsic) {
       }
 
       if (status.isInBlock) {
-        events.forEach(({ event: { method, section } }) => {
+        events.forEach(({event: {method, section}}) => {
           if (section === 'system' && method === 'ExtrinsicFailed') {
             // Error with no detail, just return error
             logger.info(`  ↪ 💸 ❌ [tx]: Send transaction(${tx.type}) failed.`);
@@ -141,12 +142,12 @@ interface IFileInfo {
 }
 
 export async function getOrderState(api: ApiPromise, cid: string) {
-  await api.isReadyOrError;
+  await api.isReady;
   const res = await api.query.market.filesV2(cid);
   const data = res ? JSON.parse(JSON.stringify(res)) : null;
   if (data) {
     try {
-      const { replicas, ...meaningfulData } = data as IFileInfo;
+      const {replicas, ...meaningfulData} = data as IFileInfo;
       return {
         meaningfulData,
         replicas,
@@ -159,7 +160,7 @@ export async function getOrderState(api: ApiPromise, cid: string) {
 }
 
 export async function getFinalizeBlockNumber(api: ApiPromise) {
-  await api.isReadyOrError;
+  await api.isReady;
   const res = await api.rpc.chain.getHeader();
   if (res) {
     return res.number.toNumber();
